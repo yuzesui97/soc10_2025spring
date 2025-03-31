@@ -1,0 +1,59 @@
+# Intro to R
+
+*This section is drafted based on Dr. Mark Hoffman's previous SOC 10 lab notes.*
+
+## R Basics
+
+This initial tutorial for R has two primary learning objectives. The first is to become affiliated with the R environment and the second is to learn how to extend the basic set of R functions to make it suitable for your own research purposes.
+
+The lessons we learn in this tutorial will serve as a strong basis for the those that follow, which focus on the actual analysis of data using R.
+
+Like most programming languages, R can serve as a calculator. We will use many of these basic mathematical operations when working with data. 
+
+Let's start with the basics:
+
+```r
+2 + 2
+return: [1] 4
+```
+```r
+3*(2+2) 
+return: [1] 12
+```
+We use the assignment operator “<-” to save the results in a vector for later.
+```r
+four <- 2+2
+sixteen <- (2+2)^2
+```
+If we type the name of the vector, it will return its values.
+```r
+four
+return: [1] 4
+```
+Functions in R also have names. Functions save lines of codes! 
+
+Later on, we will learn to write our own functions. For now, we can make use of the large body of default functions that exist within R.
+
+The most basic function is print. We can use it to output text in the console.
+```r
+print("Hello world!")
+return: [1] "Hello world!"
+```
+log() is another useful function and it has two arguments, x and base. When you call the function log() you have to specify x (the input value), while base has a default of exp(1).
+```r
+log82 <- log(x = 8, base = 2)
+```
+If you don’t specify the arguments in their correct order, you must use argument=value form or else you will get a different result.
+```r
+log1 <- log(8, base = 2)
+log2 <- log(x = 8, base = 2)
+log3 <- log(8, 2)
+log4 <- log(base = 2, x = 8)
+log5 <- log(2, 8)
+```
+
+The cat function concatenates the R objects and prints them.
+```r
+cat(log1, log2, log3, log4, log5)
+return: 3 3 3 3 0.3333333
+```
