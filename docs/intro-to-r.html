@@ -172,8 +172,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This initial tutorial for R has two primary learning objectives. The first is to become affiliated with the R environment and the second is to learn how to extend the basic set of R functions to make it suitable for your own research purposes.</p>
 <p>The lessons we learn in this tutorial will serve as a strong basis for the those that follow, which focus on the actual analysis of data using R.</p>
 <p>Like most programming languages, R can serve as a calculator. We will use many of these basic mathematical operations when working with data.</p>
+<p>Let’s start with the basics:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="intro-to-r.html#cb1-1" tabindex="-1"></a><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span></span>
 <span id="cb1-2"><a href="intro-to-r.html#cb1-2" tabindex="-1"></a>return<span class="sc">:</span> [<span class="dv">1</span>] <span class="dv">4</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="intro-to-r.html#cb2-1" tabindex="-1"></a><span class="dv">3</span><span class="sc">*</span>(<span class="dv">2</span><span class="sc">+</span><span class="dv">2</span>) </span>
+<span id="cb2-2"><a href="intro-to-r.html#cb2-2" tabindex="-1"></a>return<span class="sc">:</span> [<span class="dv">1</span>] <span class="dv">12</span></span></code></pre></div>
+<p>We use the assignment operator “&lt;-” to save the results in a vector for later.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="intro-to-r.html#cb3-1" tabindex="-1"></a>four <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">+</span><span class="dv">2</span></span>
+<span id="cb3-2"><a href="intro-to-r.html#cb3-2" tabindex="-1"></a>sixteen <span class="ot">&lt;-</span> (<span class="dv">2</span><span class="sc">+</span><span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span></span></code></pre></div>
+<p>If we type the name of the vector, it will return its values.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="intro-to-r.html#cb4-1" tabindex="-1"></a>four</span>
+<span id="cb4-2"><a href="intro-to-r.html#cb4-2" tabindex="-1"></a>return<span class="sc">:</span> [<span class="dv">1</span>] <span class="dv">4</span></span></code></pre></div>
+<p>Functions in R also have names. Functions save lines of codes!</p>
+<p>Later on, we will learn to write our own functions. For now, we can make use of the large body of default functions that exist within R.</p>
+<p>The most basic function is print. We can use it to output text in the console.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="intro-to-r.html#cb5-1" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Hello world!&quot;</span>)</span>
+<span id="cb5-2"><a href="intro-to-r.html#cb5-2" tabindex="-1"></a>return<span class="sc">:</span> [<span class="dv">1</span>] <span class="st">&quot;Hello world!&quot;</span></span></code></pre></div>
+<p>log() is another useful function and it has two arguments, x and base. When you call the function log() you have to specify x (the input value), while base has a default of exp(1).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="intro-to-r.html#cb6-1" tabindex="-1"></a>log82 <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="at">x =</span> <span class="dv">8</span>, <span class="at">base =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>If you don’t specify the arguments in their correct order, you must use argument=value form or else you will get a different result.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="intro-to-r.html#cb7-1" tabindex="-1"></a>log1 <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">8</span>, <span class="at">base =</span> <span class="dv">2</span>)</span>
+<span id="cb7-2"><a href="intro-to-r.html#cb7-2" tabindex="-1"></a>log2 <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="at">x =</span> <span class="dv">8</span>, <span class="at">base =</span> <span class="dv">2</span>)</span>
+<span id="cb7-3"><a href="intro-to-r.html#cb7-3" tabindex="-1"></a>log3 <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">8</span>, <span class="dv">2</span>)</span>
+<span id="cb7-4"><a href="intro-to-r.html#cb7-4" tabindex="-1"></a>log4 <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="at">base =</span> <span class="dv">2</span>, <span class="at">x =</span> <span class="dv">8</span>)</span>
+<span id="cb7-5"><a href="intro-to-r.html#cb7-5" tabindex="-1"></a>log5 <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">2</span>, <span class="dv">8</span>)</span></code></pre></div>
+<p>The cat function concatenates the R objects and prints them.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="intro-to-r.html#cb8-1" tabindex="-1"></a><span class="fu">cat</span>(log1, log2, log3, log4, log5)</span>
+<span id="cb8-2"><a href="intro-to-r.html#cb8-2" tabindex="-1"></a>return<span class="sc">:</span> <span class="dv">3</span> <span class="dv">3</span> <span class="dv">3</span> <span class="dv">3</span> <span class="fl">0.3333333</span></span></code></pre></div>
 
 </div>
 </div>
