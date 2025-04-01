@@ -1,2 +1,5 @@
 intro-to-r
 r-basics
+vectors
+loading-packages
+exploring-and-visualizing-data
