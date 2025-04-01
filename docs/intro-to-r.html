@@ -576,6 +576,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Now that the aesthetics are established, we tell ggplot what kind of plot we want (geom_bar specifies a bar plot). And stat = “identity” means we want to graph the values as they are in the data we provided, rather than trying to do something else with them.</p>
 <p>Barplots are useful when you want to see the relationship between a continuous variable (like partyid) and a categorical variable (like race). But what if we have two continuous variables, like age and how many hours one works a week? We can use scatterplots for that!</p>
 <p>First, let’s return the data to its original state by ungrouping it.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="intro-to-r.html#cb34-1" tabindex="-1"></a>gss <span class="ot">&lt;-</span> gss <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span></code></pre></div>
+<p>Now we can use geom_point, instead of bar, to plot the relationship between age and hours worked last week (hrs1).</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="intro-to-r.html#cb35-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> gss, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> hrs1)) <span class="sc">+</span> </span>
+<span id="cb35-2"><a href="intro-to-r.html#cb35-2" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="intro-to-r.html#cb36-1" tabindex="-1"></a><span class="do">## Warning: Removed 973 rows containing missing values (geom_point).</span></span></code></pre></div>
+<p><img src="plot%202.png" />
+With geom_smooth(), we can add a best fit line to better understand the relationship.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="intro-to-r.html#cb37-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> gss, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> hrs1)) <span class="sc">+</span> </span>
+<span id="cb37-2"><a href="intro-to-r.html#cb37-2" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb37-3"><a href="intro-to-r.html#cb37-3" tabindex="-1"></a>  <span class="fu">geom_smooth</span>()</span></code></pre></div>
+<p><img src="plot%203.png" />
+Pretty flat, with a bit of a decrease after age 50, and a weird uptick around 100 years old… perhaps that is just noise? Let’s filter out the really old people from the data. It is simple using the filter command. All we have to specify is that we want people of age less than 80, like so.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="intro-to-r.html#cb38-1" tabindex="-1"></a>gss_younger <span class="ot">&lt;-</span> gss <span class="sc">%&gt;%</span> <span class="fu">filter</span>(age <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
+<span id="cb38-2"><a href="intro-to-r.html#cb38-2" tabindex="-1"></a>  <span class="fu">geom_smooth</span>()</span></code></pre></div>
+<p>Now we replot the data, except we have to change the name of the data we are using to gss_younger!</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="intro-to-r.html#cb39-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> gss_younger, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> hrs1)) <span class="sc">+</span> </span>
+<span id="cb39-2"><a href="intro-to-r.html#cb39-2" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb39-3"><a href="intro-to-r.html#cb39-3" tabindex="-1"></a>  <span class="fu">geom_smooth</span>()</span></code></pre></div>
+<p><img src="plot%204.png" />
+We can add in another variable using color, if we want. Coloring by sex, for example, reveals remaining discrepencies in workforce participation between males and females, though there is a lot of overlap, and much more than we would have seen twenty years ago.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="intro-to-r.html#cb40-1" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> gss, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> hrs1, <span class="at">color =</span> sex)) <span class="sc">+</span> </span>
+<span id="cb40-2"><a href="intro-to-r.html#cb40-2" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div>
+<p><img src="plot%205.png" /></p>
 
 </div>
 </div>
