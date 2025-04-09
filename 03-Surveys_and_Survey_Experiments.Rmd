@@ -1,0 +1,79 @@
+# Surveys and Survey Experiments with Qualtrics
+
+*This section is drafted based on Dr. Mark Hoffman's previous SOC 10 lab notes.*
+
+## Overview
+
+In this week, we will go from using data that someone else collected to collecting data of our own using Qualtrics. Qualtrics makes collecting survey data online easy. If you have ever used something like Google Forms, it is, in many respects, quite similar, except that it is much more powerful. As you will see, we can quickly and easily build a survey experiment, administer the experiment, download the results, and import them into R. Let’s get started!
+
+## Creating a Qualtrics account
+
+Stanford is kind enough to provide all of us with access to Qualtrics. [Click here to get started](https://uit.stanford.edu/service/survey).
+
+![](week2_plot1.png)
+
+Click on the “Set up a Qualtrics account” button and it will tell you to go to https://stanforduniversity.qualtrics.com. Go to that link!
+
+![](week2_plot2.png)
+
+There, it will ask if you have a preexisting Qualtrics account or not. Click the button that pertains to you. If you don’t have a preexisting account, it will either prompt you to log-in to your Stanford account via WebAuth, or else it will automatically log-in for you and set up your account if you are already logged in.
+
+Now you should be into Qualtrics! Since you haven’t made a project previously, you only have one option: Create a new project (bottom left). Everytime you want to make a new survey you will click this button. We will make an example survey to show you the ropes.
+
+![](week2_plot3.png)
+
+It will bring you to a page with a bunch of options for creating a new survey. You can start from these pre-designed surveys if they fall in line with the kind of survey you want to run. There are even pre-built surveys for academics. For learning purposes though, we will start from scratch by clicking “From Scratch--Survey”.
+
+Now it asks us to name our project. I called it First Survey.
+
+![](week2_plot4.png)
+## Building a survey
+
+With a project created, we have been ported to Qualtric’s main user interface, where we can build a survey. Have a look around at all of the different options. Qualtrics is full of tools for creating your ideal survey, but at times that functionality can be a bit overwhelming.
+
+![](week2_plot5.png)
+
+We will start simple. Let’s start by learning how to add a question to our survey. Click the menue under "Question type" on the left and select "Text entry". 
+
+![](week2_plot6.png)
+
+There are a bunch of options and I recommend experimenting/reading up on all of them. The most essential are Text Entry, Multiple Choice, and Matrix Table. Our first question will use Text Entry. It allows us to ask a question and then have the user put in any value that they like. Multiple Choice on the other hand would let us specify the answers they can provide. For a question like – How old are you? – there are too many potential responses for multiple choice to work well, so text entry will do.
+
+We can change the text at the top of the question box to specify the question the respondent should answer:
+
+![](week2_plot7.png)
+
+Let's for example ask "How old are you?"
+
+![](week2_plot8.png)
+
+Next let’s make a more complicated multiple choice question using the matrix table. It basically allows you to ask multiple multiple choice questions at once. Let's start by clicking the blue button "Add new question" and selecting the option "Matrix table". 
+
+For example, we can copy a question from the GSS about trust in institutions to see the extent to which our respondents trust different groups, like their family or the government.
+
+![](week2_plot9.png)
+Cool! Maybe trust of this sort varies by income - we might expect rich people to support institutions more than the poor, for example, because they have historically benefitted from them.
+
+![](week2_plot10.png)
+
+If we want to put the income question after age, we can simply drag it upwards so that it comes before the question on trust.
+
+We don’t have to come up with all of the questions ourselves - Qualtrics has a question bank that you can use to find pre-written questions. Just click on the “Import from library” button at the bottom of the page.
+
+![](week2_plot11.png)
+I here import one on education level from the US demographics library. 
+
+![](week2_plot12.png)
+
+## Survey options
+
+At the bottom, we could add more question blocks (we will skip for now) and edit your end of survey message. You can customize it by scrolling down the options under "Messaging" on the left. 
+
+![](week2_plot13.png)
+
+Now let's preview our min-survey by clicking "Preview" button on the top!
+
+![](week2_plot14.png)
+
+
+

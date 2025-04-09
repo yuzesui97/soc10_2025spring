@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Stanford Spring 2025 Intro to Computational Social Science</title>
-  <meta name="description" content="Stanford Spring 2025 Intro to Computational Social Science" />
+  <title>Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science</title>
+  <meta name="description" content="Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta property="og:title" content="Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta name="twitter:title" content="Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="intro-to-r.html"/>
 
-<link rel="next" href="intro-to-r.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -172,26 +172,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Stanford Spring 2025 Intro to Computational Social Science</h1>
-<p class="author"><em>Yuze Sui</em></p>
-<p class="date"><em>2025-03-31</em></p>
+<div id="surveys-and-survey-experiments-with-qualtrics" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Week 2</span> Surveys and Survey Experiments with Qualtrics<a href="surveys-and-survey-experiments-with-qualtrics.html#surveys-and-survey-experiments-with-qualtrics" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><em>This section is drafted based on Dr. Mark Hoffman’s previous SOC 10 lab notes.</em></p>
+<div id="overview" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Overview<a href="surveys-and-survey-experiments-with-qualtrics.html#overview" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this week, we will go from using data that someone else collected to collecting data of our own using Qualtrics. Qualtrics makes collecting survey data online easy. If you have ever used something like Google Forms, it is, in many respects, quite similar, except that it is much more powerful. As you will see, we can quickly and easily build a survey experiment, administer the experiment, download the results, and import them into R. Let’s get started!</p>
 </div>
-<div id="about" class="section level1 unnumbered hasAnchor">
-<h1>About<a href="index.html#about" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><img src="cover.png" /></p>
-<p><em>Figure Source: Katie Pacyna</em></p>
-<p>With an ever-growing amount of data collected on our online and offline behaviors—from our purchasing habits to our social interactions—we now have the unprecedented opportunity to study social life with remarkable precision. This hands-on course explores the promises and pitfalls of leveraging “big data” and algorithms to understand modern social and economic systems. Each week, we will examine key sociological topics such as inequality, discrimination, and polarization through the lens of computational methods, as well as delve into cutting-edge techniques in computational social science. The course culminates in a group research project that will equip you with skills ranging from designing and executing large-scale surveys and experiments to fitting machine learning models and analyzing diverse data types like social networks and natural language. No prior statistical or programming experience is required.</p>
-<p>This website is the place where you can find R progamming lab notes for the course.</p>
+<div id="creating-a-qualtrics-account" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Creating a Qualtrics account<a href="surveys-and-survey-experiments-with-qualtrics.html#creating-a-qualtrics-account" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Stanford is kind enough to provide all of us with access to Qualtrics. <a href="https://uit.stanford.edu/service/survey">Click here to get started</a>.</p>
+<p><img src="week2_plot1.png" /></p>
+<p>Click on the “Set up a Qualtrics account” button and it will tell you to go to <a href="https://stanforduniversity.qualtrics.com" class="uri">https://stanforduniversity.qualtrics.com</a>. Go to that link!</p>
+<p><img src="week2_plot2.png" /></p>
+<p>There, it will ask if you have a preexisting Qualtrics account or not. Click the button that pertains to you. If you don’t have a preexisting account, it will either prompt you to log-in to your Stanford account via WebAuth, or else it will automatically log-in for you and set up your account if you are already logged in.</p>
+<p>Now you should be into Qualtrics! Since you haven’t made a project previously, you only have one option: Create a new project (bottom left). Everytime you want to make a new survey you will click this button. We will make an example survey to show you the ropes.</p>
+<p><img src="week2_plot3.png" /></p>
+<p>It will bring you to a page with a bunch of options for creating a new survey. You can start from these pre-designed surveys if they fall in line with the kind of survey you want to run. There are even pre-built surveys for academics. For learning purposes though, we will start from scratch by clicking “From Scratch–Survey”.</p>
+<p>Now it asks us to name our project. I called it First Survey.</p>
+<p><img src="week2_plot4.png" /></p>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
+<a href="intro-to-r.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="intro-to-r.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -222,7 +231,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/yuzesui97/soc10_2025spring/edit/main/index.Rmd",
+"link": "https://github.com/yuzesui97/soc10_2025spring/edit/main/03-Surveys_and_Survey_Experiments.Rmd",
 "text": "Edit"
 },
 "history": {
@@ -230,7 +239,7 @@ gitbook.start({
 "text": null
 },
 "view": {
-"link": "https://github.com/yuzesui97/soc10_2025spring/blob/main/index.Rmd",
+"link": "https://github.com/yuzesui97/soc10_2025spring/blob/main/03-Surveys_and_Survey_Experiments.Rmd",
 "text": null
 },
 "download": null,

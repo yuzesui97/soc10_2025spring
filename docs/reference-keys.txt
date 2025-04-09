@@ -3,3 +3,6 @@ r-basics
 vectors
 loading-packages
 exploring-and-visualizing-data
+surveys-and-survey-experiments-with-qualtrics
+overview
+creating-a-qualtrics-account
