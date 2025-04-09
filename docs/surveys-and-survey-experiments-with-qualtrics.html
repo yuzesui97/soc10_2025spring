@@ -152,6 +152,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="2.1" data-path="surveys-and-survey-experiments-with-qualtrics.html"><a href="surveys-and-survey-experiments-with-qualtrics.html#overview"><i class="fa fa-check"></i><b>2.1</b> Overview</a></li>
 <li class="chapter" data-level="2.2" data-path="surveys-and-survey-experiments-with-qualtrics.html"><a href="surveys-and-survey-experiments-with-qualtrics.html#creating-a-qualtrics-account"><i class="fa fa-check"></i><b>2.2</b> Creating a Qualtrics account</a></li>
+<li class="chapter" data-level="2.3" data-path="surveys-and-survey-experiments-with-qualtrics.html"><a href="surveys-and-survey-experiments-with-qualtrics.html#survey-options"><i class="fa fa-check"></i><b>2.3</b> Survey options</a></li>
+<li class="chapter" data-level="2.4" data-path="surveys-and-survey-experiments-with-qualtrics.html"><a href="surveys-and-survey-experiments-with-qualtrics.html#a-quick-survey-experiment"><i class="fa fa-check"></i><b>2.4</b> A quick survey experiment</a></li>
+<li class="chapter" data-level="2.5" data-path="surveys-and-survey-experiments-with-qualtrics.html"><a href="surveys-and-survey-experiments-with-qualtrics.html#publish-it"><i class="fa fa-check"></i><b>2.5</b> Publish it!</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -190,7 +193,52 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="week2_plot3.png" /></p>
 <p>It will bring you to a page with a bunch of options for creating a new survey. You can start from these pre-designed surveys if they fall in line with the kind of survey you want to run. There are even pre-built surveys for academics. For learning purposes though, we will start from scratch by clicking “From Scratch–Survey”.</p>
 <p>Now it asks us to name our project. I called it First Survey.</p>
-<p><img src="week2_plot4.png" /></p>
+<p><img src="week2_plot4.png" />
+## Building a survey</p>
+<p>With a project created, we have been ported to Qualtric’s main user interface, where we can build a survey. Have a look around at all of the different options. Qualtrics is full of tools for creating your ideal survey, but at times that functionality can be a bit overwhelming.</p>
+<p><img src="week2_plot5.png" /></p>
+<p>We will start simple. Let’s start by learning how to add a question to our survey. Click the menue under “Question type” on the left and select “Text entry”.</p>
+<p><img src="week2_plot6.png" /></p>
+<p>There are a bunch of options and I recommend experimenting/reading up on all of them. The most essential are Text Entry, Multiple Choice, and Matrix Table. Our first question will use Text Entry. It allows us to ask a question and then have the user put in any value that they like. Multiple Choice on the other hand would let us specify the answers they can provide. For a question like – How old are you? – there are too many potential responses for multiple choice to work well, so text entry will do.</p>
+<p>We can change the text at the top of the question box to specify the question the respondent should answer:</p>
+<p><img src="week2_plot7.png" /></p>
+<p>Let’s for example ask “How old are you?”</p>
+<p><img src="week2_plot8.png" /></p>
+<p>Next let’s make a more complicated multiple choice question using the matrix table. It basically allows you to ask multiple multiple choice questions at once. Let’s start by clicking the blue button “Add new question” and selecting the option “Matrix table”.</p>
+<p>For example, we can copy a question from the GSS about trust in institutions to see the extent to which our respondents trust different groups, like their family or the government.</p>
+<p><img src="week2_plot9.png" />
+Cool! Maybe trust of this sort varies by income - we might expect rich people to support institutions more than the poor, for example, because they have historically benefitted from them.</p>
+<p><img src="week2_plot10.png" /></p>
+<p>If we want to put the income question after age, we can simply drag it upwards so that it comes before the question on trust.</p>
+<p>We don’t have to come up with all of the questions ourselves - Qualtrics has a question bank that you can use to find pre-written questions. Just click on the “Import from library” button at the bottom of the page.</p>
+<p><img src="week2_plot11.png" />
+I here import one on education level from the US demographics library.</p>
+<p><img src="week2_plot12.png" /></p>
+</div>
+<div id="survey-options" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Survey options<a href="surveys-and-survey-experiments-with-qualtrics.html#survey-options" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>At the bottom, we could add more question blocks (we will skip for now) and edit your end of survey message. You can customize it by scrolling down the options under “Messaging” on the left.</p>
+<p><img src="week2_plot13.png" /></p>
+<p>Now let’s preview our min-survey by clicking “Preview” button on the top!</p>
+<p><img src="week2_plot14.png" /></p>
+</div>
+<div id="a-quick-survey-experiment" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> A quick survey experiment<a href="surveys-and-survey-experiments-with-qualtrics.html#a-quick-survey-experiment" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>To set up a survey experiment, we have to set up a block of questions from which respondents will only get one of the N questions in the block. This selection is randomized, so that we can see how the randomization affects their responses. Here is a quick example.</p>
+<p>First add a new block. Now we have two blocks. Now add the two different versions of the survey prompt to the block.</p>
+<p><img src="week2_plot15.png" /></p>
+<p>The last step is to make sure that the questions from this block are sampled randomly for each respondent, and that only one of these questions will be selected. We can achieve this by editing the block’s options. Click the block and select the Question Randomization option one the left.</p>
+<p>This should pull up the Question Randomization menu. We can choose: no randomization, to randomize the order of questions, or to randomly select N questions from the block to present to the respondent. Select the last optin and set the number to 1 and we will have our first survey experiment.</p>
+<p><img src="week2_plot16.png" /></p>
+</div>
+<div id="publish-it" class="section level2 hasAnchor" number="2.5">
+<h2><span class="header-section-number">2.5</span> Publish it!<a href="surveys-and-survey-experiments-with-qualtrics.html#publish-it" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Now we can either preview again to double check or publish the survey! Once it is published, we can distribute it to respondents. We could do this on Mechanical Turk, as we will learn in a later class, or we can just send it to our friends. To do that click on the “Distributions” tab at the top of the survey. It will ask how you want to distribute your survey.</p>
+<p>You can do it by email, or by my preferred way, which is to “Get a single reusable link” which you can send to anyone who you want to take your survey. You can also generate a trackable link for each respondent if you want to keep track of who responded.</p>
+<p>When someone responds to your survey, inside the Data and Analysis pane in Qualtrics, you should see a response!</p>
+<p><img src="week2_plot17.png" /></p>
+<p>We can export it using the “Export &amp; Import” data button and then clicking Export Data. Export it as a .csv because those files are super easy to load into R. It will download a .zip file to your computer. Once you unzip it, you will be able to load the resulting file into R. First, I would rename it, so that it is easy to input into R. I called the file trial_survey.csv. Drag it to your R project and then you can load it into R using the read.csv() function. Simple!</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="surveys-and-survey-experiments-with-qualtrics.html#cb41-1" tabindex="-1"></a>survey <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;Data/first_survey.csv&quot;</span>)</span></code></pre></div>
 
 </div>
 </div>

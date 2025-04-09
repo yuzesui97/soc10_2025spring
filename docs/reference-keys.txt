@@ -6,3 +6,6 @@ exploring-and-visualizing-data
 surveys-and-survey-experiments-with-qualtrics
 overview
 creating-a-qualtrics-account
+survey-options
+a-quick-survey-experiment
+publish-it
