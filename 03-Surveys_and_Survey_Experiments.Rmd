@@ -75,5 +75,31 @@ Now let's preview our min-survey by clicking "Preview" button on the top!
 
 ![](week2_plot14.png)
 
+## A quick survey experiment
 
+To set up a survey experiment, we have to set up a block of questions from which respondents will only get one of the N questions in the block. This selection is randomized, so that we can see how the randomization affects their responses. Here is a quick example.
 
+First add a new block. Now we have two blocks. Now add the two different versions of the survey prompt to the block. 
+
+![](week2_plot15.png)
+
+The last step is to make sure that the questions from this block are sampled randomly for each respondent, and that only one of these questions will be selected. We can achieve this by editing the block’s options. Click the block and select the Question Randomization option one the left.
+
+This should pull up the Question Randomization menu. We can choose: no randomization, to randomize the order of questions, or to randomly select N questions from the block to present to the respondent. Select the last optin and set the number to 1 and we will have our first survey experiment.
+
+![](week2_plot16.png)
+
+## Publish it!
+
+Now we can either preview again to double check or publish the survey! Once it is published, we can distribute it to respondents. We could do this on Mechanical Turk, as we will learn in a later class, or we can just send it to our friends. To do that click on the “Distributions” tab at the top of the survey. It will ask how you want to distribute your survey.
+
+You can do it by email, or by my preferred way, which is to “Get a single reusable link” which you can send to anyone who you want to take your survey. You can also generate a trackable link for each respondent if you want to keep track of who responded.
+
+When someone responds to your survey, inside the Data and Analysis pane in Qualtrics, you should see a response!
+
+![](week2_plot17.png)
+
+We can export it using the “Export & Import” data button and then clicking Export Data. Export it as a .csv because those files are super easy to load into R. It will download a .zip file to your computer. Once you unzip it, you will be able to load the resulting file into R. First, I would rename it, so that it is easy to input into R. I called the file trial_survey.csv. Drag it to your R project and then you can load it into R using the read.csv() function. Simple!
+```r
+survey <- read.csv("Data/first_survey.csv")
+```
