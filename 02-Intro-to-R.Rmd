@@ -494,6 +494,37 @@ x is the x variable (i.e. the variable on the x-axis of the graph), y is the y v
 
 Now that the aesthetics are established, we tell ggplot what kind of plot we want (geom_bar specifies a bar plot). And stat = “identity” means we want to graph the values as they are in the data we provided, rather than trying to do something else with them.
 
+Let me now use another example ("marital" variable, which represents marital status) to demonstrate how we can further beautify a bar plot. Specifically, I will show how to edit the labels on the X-axis. 
+If we directly plot it using the following code, you will notice the x-axis labels are not readable in the sense we do not know what different numbers represent. 
+
+```r
+gss$marital <- as.character(gss$marital)
+ggplot(gss, aes(x = marital)) + 
+  geom_bar(fill = "blue",) + 
+  labs(title = "Marital Status of Respondents", x = "Marital Status", y = "Frequency")
+```
+![](marital1.png)
+
+Alternatively, we can add a scale_x_discrete() option to manually label the different values:
+
+```r
+gss$marital <- as.character(gss$marital)
+ggplot(gss, aes(x = marital)) + 
+  geom_bar(fill = "blue",) + 
+  scale_x_discrete(labels=c("1" = "Married", "2" = "Widowed","3" = "Divorced", "4" = "Separated", "5" = "Never married")) +
+  labs(title = "Marital Status of Respondents", x = "Marital Status", y = "Frequency")
+```
+
+![](marital2.png)
+
+```r
+gss$marital <- as.character(gss$marital)
+ggplot(gss, aes(x = marital)) + 
+  geom_bar(fill = "blue",) + 
+  scale_x_discrete(labels=c("1" = "Married", "2" = "Widowed","3" = "Divorced", "4" = "Separated", "5" = "Never married")) +
+  labs(title = "Marital Status of Respondents", x = "Marital Status", y = "Frequency")
+```
+
 Barplots are useful when you want to see the relationship between a continuous variable (like partyid) and a categorical variable (like race). But what if we have two continuous variables, like age and how many hours one works a week? We can use scatterplots for that!
 
 First, let’s return the data to its original state by ungrouping it.
