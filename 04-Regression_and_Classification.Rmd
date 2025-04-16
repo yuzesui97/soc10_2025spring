@@ -1,0 +1,60 @@
+# Regression and Classification
+
+*This section is drafted based on Dr. Mark Hoffman's previous SOC 10 lab notes and kassambara's tutorial on logistic regression with R on STHDA.*
+
+This week’s lab introduces fundamental machine learning techniques widely used in computational social science to both model and analyze data. In contrast to traditional programming—where explicit instructions are provided at every step—machine learning equips computers with the ability to identify patterns and make decisions based on data. Generally, our objectives in machine learning are threefold: to describe and understand the data, to develop models that test theories about how the data is generated, and to make predictions that generalize to new, similar situations.
+
+We begin by exploring Linear Regression, a popular method in the social sciences for modeling relationships between variables. Regression analysis allows us to quantify how changes in one or more predictor variables are associated with changes in a continuous outcome variable. This technique not only provides insights into the underlying patterns of the data but also is useful for predicting continuous outcomes (e.g., household income, movie box office).
+
+In addition to regression, we will also cover Classification techniques, with a particular focus on Logistic Regression. Unlike regression, which deals with predicting continuous outcomes, classification methods are designed to predict categorical outcomes. For example, logistic regression models the probability of an observation belonging to a particular category—often a binary outcome—by leveraging a logistic function. The key difference between regression and classification lies in their goals: while regression estimates a numerical value, classification assigns an observation to a discrete class based on learned patterns in the data.
+
+## Linear Regression (Using 2018 GSS data as an example)
+
+In the previous two labs, we learned how to download data and visualize patterns between variables. In what follows, we will go beyond data visualization and begin to ask theoretically informed questions and using data, again, from the GSS, to answer those questions. Where before we plotted two variables against each other to see their relationship, linear regression will allow us to quantify their relationship: how much do changes in our explanatory variable lead to changes in the variable we are hoping to explain? Is this relationship statistically significant - that is, does it differ from what we should expect by chance?
+
+Linear regression will also allow us to adjust for covariates - variables that may be affecting our primary dependent variable of interest as well as our independent variable. For example, in classic example of confounding, we may see that the number of ice cream cones people eat per year is correlated with the number of sunburns they get and think that ice cream causes sunburns. However, it is obvious that both of these factors will be influenced by how warm of a climate people live in - with people living in warmer climates consuming more ice cream AND getting more sunburns. By controlling for the warmth of the climate, we can adjust for this fact and likely any association we saw between ice cream and sunburns will go away.
+
+![](week3_plot1.png)
+*Figure Source: Parsa Ghaffari.*
+
+## How linear regression works
+
+You may remember the slope-intercept form of writing the equation of a straight line from algebra. 
+
+$$
+y = mx + b
+$$
+
+Here, we can calculate the coordinate y for any x by first multiplying x by the slope of the line, m, and adding the value of the intercept, b, which is where the line intersects with the y axis.
+
+![](week3_plot2.png)
+*Figure Source: tecmath.*
+
+Linear regression is a strategy for finding the line that best fits the relationship between two variables (later on we can add more variables as control variables). We start with a y variable, also called the outcome or the dependent variable, and an x variable, also called a predictor or the independent variable, and ask what is the slope-intercept equation that most closely approximates their relationship. Given x and y, linear regression therefore involves estimating the slope, m, and intercept, b, of the line.
+
+Rarely in real world applications are two variables perfectly related to one another: even the best social science models have error. To reflect this, we update the equation above to:
+
+$$
+y = mx + b + ε
+$$
+With ε capturing the error in our predictions.
+
+How do we fit a line to x and y? The short of it is that we will start with line (say, a horizontal one) and keep adjusting the slope and intercept of that line to minimize the average distance between the data points and the line itself. Residuals are the difference between the observed values and the values predicted by the line:
+
+$$
+residual_i=y_i−\hat{y}_i
+$$
+
+Linear regression will seek to minimize the sum of the squared residuals, also known as the sum of squares:
+
+$$
+\text{SumSquares} = \sum_{i=1}^n \left(y_i - \hat{y}_i\right)^2
+$$
+
+![](week3_plot4.png)
+*Figure Source: statisticsfun.*
+
+## Linear regression using the lm function
+Thankfully, as computational social scientists, we won’t have to do this adjustment by hand. The lm function in R uses an algorithm, called gradient descent, to find the linear regression line that best minimizes the sum of squares for us.
+
+
