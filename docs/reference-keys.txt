@@ -9,3 +9,10 @@ creating-a-qualtrics-account
 survey-options
 a-quick-survey-experiment
 publish-it
+regression-and-classification
+linear-regression
+how-linear-regression-works
+linear-regression-using-the-lm-function
+multiple-regression
+linear-regression-prediction
+classification-logistic-regression
