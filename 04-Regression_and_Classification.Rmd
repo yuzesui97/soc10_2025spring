@@ -252,6 +252,8 @@ To get a better prediction, more tailored to you and your background, we would n
 ## Classification (Logistic Regression)
 Logistic regression is used to predict the class (or category) of individuals based on one or multiple predictor variables (x). It is used to model a binary outcome, that is a variable, which can have only two possible values: 0 or 1, yes or no, diseased or non-diseased.
 
+![](week3_final_plot.png)
+
 The R function glm(), for generalized linear model, can be used to compute logistic regression. You need to specify the option family = binomial, which tells to R that we want to fit logistic regression.
 
 ```r
