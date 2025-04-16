@@ -255,11 +255,61 @@ Logistic regression is used to predict the class (or category) of individuals ba
 The R function glm(), for generalized linear model, can be used to compute logistic regression. You need to specify the option family = binomial, which tells to R that we want to fit logistic regression.
 
 ```r
-gss$sex <- as.numeric(gss$sex)
-gss$male <- gss$sex
-gss$male[gss$male==2] <- 0
-table(gss$male)
+mean(gss$realinc,na.rm=T)
+gss$high_income <- 0
+gss$high_income[gss$realinc > 33749.7] <- 1
+table(gss$high_income)
 
-model <- glm( diabetes ~., data = train.data, family = binomial)
+model <- glm(high_income ~ educ, data = gss, family = binomial)
 summary(model)
+```
 
+```r
+Call:
+glm(formula = high_income ~ educ, family = binomial, data = gss)
+
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -4.67368    0.27149  -17.21   <2e-16 ***
+educ         0.27891    0.01854   15.04   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2954.3  on 2344  degrees of freedom
+Residual deviance: 2682.4  on 2343  degrees of freedom
+  (3 observations deleted due to missingness)
+AIC: 2686.4
+
+Number of Fisher Scoring iterations: 4
+```
+
+The model is specified as:
+$$
+logit(P(high income))= −4.67368 + 0.27891 × educ
+$$
+
+To convert this log-odds effect into an odds ratio, you exponentiate the coefficient:
+
+$$
+exp(0.27891)≈1.322
+$$
+
+This means that each additional unit (e.g., year) of education is associated with approximately a 32.2% (1.322-1) increase in the odds of high income. The very low p-value (< 2e-16) suggests that the effect of education on the probability of high income is statistically significant.
+
+```r
+you <- data.frame(Name = "YOURNAMEHERE", age = 22, educ = 16)
+```
+
+```r
+predicted_probability <- predict(model, newdata = you, type = "response")
+predicted_probability
+```
+
+The output will be the probability that you with the specified education level is in the high_income category.
+
+```r
+predicted_probability
+0.4474074 
+```
