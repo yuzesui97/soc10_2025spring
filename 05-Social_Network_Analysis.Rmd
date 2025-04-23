@@ -298,6 +298,18 @@ The output is:
 ```
 Essentially, for any two random nodes in the network, it on vargae takes 4.86 steps to reach from one node to the other node.
 
+### Assortativity
+The assortativity coefficient is positive is similar vertices (based on some external property) tend to connect to each, and negative otherwise. Just like the concept of homophoily!
+
+```r
+assortativity(g, as.factor(V(g)$key_character), directed = FALSE)
+```
+The output is:
+```r
+-0.08629372
+```
+Essentially, main characters engage with supporting characters!
+
 ### Betweenness centrality
 Betweenness centrality is a network analysis metric that measures the extent to which a node lies on shortest paths between other nodes in a network. It quantifies the importance of a node in connecting different parts of the network. A node with high betweenness centrality is often a "bridge" or "connector" between various nodes or groups of nodes in the network. 
 
