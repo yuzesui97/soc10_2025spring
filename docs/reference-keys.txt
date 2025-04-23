@@ -16,5 +16,16 @@ linear-regression-using-the-lm-function
 multiple-regression
 linear-regression-prediction
 classification-logistic-regression
-regression-and-classification-1
+social-network-analysis
 understanding-network-data-structures-in-r
+visualizing-network-data-in-r
+key-network-measures
+degree-how-many-friends-do-i-have
+weighted-degree-strength
+global-clustering-coefficient-gcc
+average-path-length-apl
+betweenness-centrality
+visualizing-key-measures
+benchmark-our-empirical-network
+find-local-clusterscommunities
+extensions
