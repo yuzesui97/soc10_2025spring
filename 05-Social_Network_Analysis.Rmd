@@ -366,3 +366,96 @@ plot(
   main = "Les Misérables Character Co-appearance Network"
 )
 ```
+
+![](week4_degree.png)
+
+For example, we can make node size proportional to betweenness centrality measure:
+
+```r
+V(g)$size <- betweenness(g, weights = NA)
+set.seed(12)  # for reproducible layout
+plot(
+  g,
+  layout = layout_with_fr(g),
+  vertex.label.cex = 0.7,
+  vertex.size     = V(g)$size / 100,
+  edge.width      = 0.5 * E(g)$weight,  # edge widths scale with weight
+  main = "Les Misérables Character Co-appearance Network"
+)
+```
+
+![](week4_between.png)
+
+## Benchmark our empirical network
+I just introduced the measure of GCC and APL. You may wonder, for our empirical network, is the GCC/APL high or low? We often need to benchmark it to a random graph to answer this question. 
+
+A random graph (also known as Erdős–Rényi random graph) preseves the same number of nodes and edges for an empirical network. However, the edges are randomly conencted for the random network. 
+
+```r
+set.seed(123)
+n <- vcount(g)
+m <- ecount(g)
+g_r <- sample_gnm(n, m, directed = FALSE, loops = FALSE)
+gcc_rand <- transitivity(g_r, type = "global")
+apl_rand <- average.path.length(g_r, directed = FALSE)
+```
+
+The GCC for the random network is only 0.0745003 and the APL is 2.471634. What is the implication? The random network is less locally clustered but more globally connected!
+
+
+```r
+set.seed(12)  # for reproducible layout
+plot(
+  g_r,
+  layout = layout_with_fr(g_r),
+  vertex.label = NA,
+  vertex.size     = 5,
+  edge.width      = 1,  
+  main = "Random Network"
+)
+```
+
+![](week4_random.png)
+
+Can we have both high GCC and low APL? Yes! The small-world network!
+
+![](week4_small_world.png)
+
+## Find local clusters/communities
+
+There are multiple community detection methods. louvain is a popular one and it works for weighted network.
+
+```r
+Community detection (weighted Louvain)
+com <- cluster_louvain(g, weights = E(g)$weight)
+
+# "Number of communities found"
+length(com)
+```
+
+```r
+V(g)$community <- membership(com)
+V(g)$color <- V(g)$community
+
+set.seed(12)
+plot(
+  g,
+  layout            = layout_with_fr(g),
+  vertex.label.cex  = 0.7,
+  vertex.label.color= "black",
+  vertex.size     = 5,
+  vertex.color= V(g)$color,
+  edge.width        =  0.5 * E(g)$weight,
+  main = "Les Misérables – Louvain Communities"
+)
+```
+
+![](week4_community.png)
+
+# Extensions
+Social network analysis is a powerful tool and there are much more could be done to our data! Check out https://r.igraph.org/ for more network analysis techniques using R.
+
+If you are interested in social network datasets, check out https://icon.colorado.edu/networks
+
+Also check out this awesome interactive social network page on "Six Degrees of Francis Bacon":  http://sixdegreesoffrancisbacon.com/?ids=10000473&min_confidence=60&type=network
+
