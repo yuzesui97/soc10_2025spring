@@ -452,7 +452,7 @@ plot(
 
 ![](week4_community.png)
 
-## Extensions
+##Other Resources
 Social network analysis is a powerful tool and there are much more could be done to our data! Check out https://r.igraph.org/ for more network analysis techniques using R.
 
 If you are interested in social network datasets, check out https://icon.colorado.edu/networks
