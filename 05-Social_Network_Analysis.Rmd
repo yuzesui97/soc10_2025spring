@@ -1,0 +1,37 @@
+# Regression and Classification
+
+*Part of this section is drafted based on Dr. Mark Hoffman's previous SOC 10 lab notes.*
+
+This week our tutorial will cover social network analysis. Social network analysis focuses on patterns of relations between actors and is a key approach to study issues like homopohily and social diffusion. 
+
+## Understanding network data structures in R
+
+One simple way to represent a graph is to list the edges, which we will refer to as an edge list. For each edge, we just list who that edge is incident on. Edge lists are therefore two column matrices (or dataframe in the language of R) that directly tell the computer which actors are tied for each edge. In a directed graph, the actors in column A are the sources of edges, and the actors in Column B receive the tie. In an undirected graph, order doesn’t matter.
+
+Let me use a real social network data as a guiding example for the tutorial. This network is a network of scene coappearances of characters in Victor Hugo's novel "Les Miserables." Edge weights denote the number of such occurrences. The data source is D. E. Knuth, "The Stanford GraphBase: A Platform for Combinatorial Computing." Addison-Wesley, Reading, MA (1993).
+
+I converted the raw data format to make it easy for use in R. Let's load the "lesmis_edges.csv" first, which is the edge list file. 
+
+```r
+edges  <- read.csv("lesmis_edges.csv")
+```
+
+Let's take a look at this dataframe:
+
+```r
+head(edges)
+```
+```r
+  source target weight
+1      1      2      1
+2      1      3      8
+3      1      4     10
+4      1      5      1
+5      1      6      1
+6      1      7      1
+```
+
+
+
+
+
