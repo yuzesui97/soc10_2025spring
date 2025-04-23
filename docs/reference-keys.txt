@@ -16,3 +16,5 @@ linear-regression-using-the-lm-function
 multiple-regression
 linear-regression-prediction
 classification-logistic-regression
+regression-and-classification-1
+understanding-network-data-structures-in-r

@@ -1,7 +1,5 @@
 # Regression and Classification
 
-*Part of this section is drafted based on Dr. Mark Hoffman's previous SOC 10 lab notes.*
-
 This week our tutorial will cover social network analysis. Social network analysis focuses on patterns of relations between actors and is a key approach to study issues like homopohily and social diffusion. 
 
 ## Understanding network data structures in R
@@ -36,8 +34,91 @@ In the case of co-appearence, linkages are not directional. Thus, each pair of n
 
 For the edgelist dataframe, we only report node pairs that have links. Thus the third column, which represents the intensity of the connection (i.e., edge weight), is never zero. The "weight" column could have varied values if the network is weighted. The Les Miserables network is weighted that weights represent the number of co-occurence. For some networks, egdes are not weighted (i.e., weight column = 1 for all rows). For such unweighted networks, we could omit the "weight" column. 
 
+Besides the edgelist data, when conducting social network analysis in R, we often have a second dataframe that stores node-level attributes (though it is not required to have this node-level dataframe to conduct network analysis in R). For the Les Miserables network, we have node-level attributes that store the actual charater names that the nodes correspond to and whether the character is a key character in the novel. 
 
+```r
+nodes  <- read.csv("lesmis_nodes.csv")
+```
 
+Let's take a look at this dataframe using function head():
+
+```r
+head(nodes)
+```
+
+```r
+  id           name key_character
+1  1         Myriel            no
+2  2       Napoleon            no
+3  3 MlleBaptistine            no
+4  4    MmeMagloire            no
+5  5   CountessDeLo            no
+6  6       Geborand            no
+```
+
+The first column "id" corresponds to the values in the "source" and "target" columns for the edgelist dataframe. For the node dataframe, each node appears once and the columns represent their corresponding attributes. 
+
+## Visualizing network data in R
+
+Now with the edgelist and the node-level attributes, we are ready to construct a social network using R! Specifically, we will use the "igraph" pacakge in R. If this is your first time using it, again, remeber you need to install it first.
+
+```r
+install.packages("igraph")
+```
+
+Then we can activate this package:
+```r
+library(igraph)
+```
+
+Then we can construct the network using function graph_from_data_frame(). The first parameter is our edgelist dataframe. The second parameter defines whether or not the network is directed. The third defines node-level attributes:
+
+```r
+g <- graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
+```
+
+We can check some quick statistics for this network.
+
+```r
+#Number of nodes 
+vcount(g)
+
+#Number of edges 
+ecount(g)
+
+#Is directed?
+is_directed(g)
+
+#Is weighted?
+is_weighted(g)
+```
+
+Let's also quickly plot it!
+
+```r
+plot(
+  g,
+  main = "Les Misérables Character Co-appearance Network"
+)
+```
+![](week4_plot1.png)
+
+It looks okay but we can for sure make it prettier!
+
+```r
+set.seed(12)  # for reproducible layout
+plot(
+  g,
+  layout = layout_with_fr(g),
+  vertex.label.cex = 0.7,
+  vertex.size     = 6,
+  edge.width      = 0.5 * E(g)$weight,  # edge widths scale with weight
+  main = "Les Misérables Character Co-appearance Network"
+)
+```
+![](week4_plot2.png)
+
+Wow! Much better! So what we did? layout_with_fr() is a function that forces R to arrange the network using the so-called "Fruchterman and Reingold algorithm". Essentially, nodes with denser connections are put closer under this algorithm. 
 
 
 
