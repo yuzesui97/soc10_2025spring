@@ -91,6 +91,12 @@ is_directed(g)
 
 #Is weighted?
 is_weighted(g)
+
+#node names
+V(g)$names
+
+#edge weigths
+E(g)$weight
 ```
 
 Let's also quickly plot it!
@@ -118,9 +124,36 @@ plot(
 ```
 ![](week4_plot2.png)
 
-Wow! Much better! So what we did? layout_with_fr() is a function that forces R to arrange the network using the so-called "Fruchterman and Reingold algorithm". Essentially, nodes with denser connections are put closer under this algorithm. 
+Wow! Much better! So what we did? layout_with_fr() is a function that forces R to arrange the network using the so-called "Fruchterman and Reingold algorithm". Essentially, nodes with denser connections are put closer under this algorithm. vertex.label.cex tunes the label size for the node label (character name in this case). vertex.size tunes the size for the node. edge.width adjusts for the width of the edges. There are far more parameters that you can tune! Check out https://igraph.org
 
+Now let's further improve the plot! Recall we have this one additional column called "key_character" for the node dataframe. Let's highlight the main/key characters with a different color.
 
+```r
+V(g)$color <- "blue"
+V(g)$color[V(g)$key_character == "yes"] <- "red"
 
+set.seed(12)                       # for reproducible layout
+plot(
+  g,
+  layout = layout_with_fr(g),
+  vertex.label.cex = 0.7,
+  vertex.size     = 6,
+  vertex.color=V(g)$color,
+  edge.width      = 0.5 * E(g)$weight,  # edge widths scale with weight
+  main = "Les Misérables Character Co-appearance Network"
+)
+
+legend(
+  "topleft",
+  legend = c("Key character", "Other character"),
+  pt.bg  = c("red", "blue"),
+  pch    = 21,
+  bty    = "n",
+  cex    = 0.8
+)
+```
+![](week4_plot3.png)
+
+Main characters are indeed more central in the network!
 
 
