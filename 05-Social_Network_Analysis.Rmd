@@ -1,4 +1,4 @@
-# Regression and Classification
+# Social Network Analysis
 
 This week our tutorial will cover social network analysis. Social network analysis focuses on patterns of relations between actors and is a key approach to study issues like homopohily and social diffusion. 
 
@@ -155,5 +155,140 @@ legend(
 ![](week4_plot3.png)
 
 Main characters are indeed more central in the network!
+
+Now let's try to explore the network more to quantitatively describe its structure. 
+
+## Key network measures
+### Degree (“How many friends do I have?”)
+For an undirected network, the degree of a node n is the count of edges incident on n. For a directed network, a node n can have in-degree (count of inflows) and out-degree (cout of outflows) 
+
+```r
+degree(g)                     # degree
+```
+
+Let's sort the result.
+```r
+sort(degree(g))               
+```
+
+Output: 
+```r
+        Napoleon     CountessDeLo         Geborand     Champtercier 
+               1                1                1                1 
+        Cravatte            Count           OldMan          Labarre 
+               1                1                1                1 
+          MmeDeR          Isabeau          Gervais      Scaufflaire 
+               1                1                1                1 
+    Boulatruelle          Gribier        Jondrette      MlleVaubois 
+               1                1                1                1 
+  MotherPlutarch       Marguerite         Perpetue           Woman1 
+               1                2                2                2 
+  MotherInnocent        MmeBurgon           Magnon     MmePontmercy 
+               2                2                2                2 
+       BaronessT           Child1           Child2   MlleBaptistine 
+               2                2                2                3 
+     MmeMagloire        Pontmercy          Anzelma           Woman2 
+               3                3                3                3 
+       Toussaint     Fauchelevent         Simplice   LtGillenormand 
+               3                4                4                4 
+           Judge     Champmathieu           Brevet       Chenildieu 
+               6                6                6                6 
+     Cochepaille        Listolier          Fameuil      Blacheville 
+               6                7                7                7 
+       Favourite           Dahlia          Zephine     Gillenormand 
+               7                7                7                7 
+MlleGillenormand           Brujon     MmeHucheloup       Bamatabois 
+               7                7                7                8 
+       Tholomyes        Prouvaire     Montparnasse           Myriel 
+               9                9                9               10 
+       Grantaire        Gueulemer            Babet       Claquesous 
+              10               10               10               10 
+   MmeThenardier          Cosette          Eponine           Mabeuf 
+              11               11               11               11 
+      Combeferre          Feuilly          Bahorel             Joly 
+              11               11               12               12 
+      Courfeyrac          Bossuet          Fantine         Enjolras 
+              13               13               15               15 
+      Thenardier           Javert           Marius         Gavroche 
+              16               17               19               22 
+         Valjean 
+              36 
+```
+
+If the network is directed, we can calculate in-degree:
+
+```r
+degree(g, mode = "in)                  
+```
+
+### Weighted degree (strength)
+The strength of node n is the sum of edge weights. 
+
+```r
+sort(strength(g))
+```
+```r
+        Napoleon     CountessDeLo         Geborand     Champtercier 
+               1                1                1                1 
+        Cravatte           OldMan          Labarre           MmeDeR 
+               1                1                1                1 
+         Isabeau          Gervais      Scaufflaire     Boulatruelle 
+               1                1                1                1 
+       Jondrette      MlleVaubois            Count          Gribier 
+               1                1                2                2 
+          Magnon     MmePontmercy        BaronessT       Marguerite 
+               2                2                2                3 
+        Perpetue           Woman1        Pontmercy        MmeBurgon 
+               3                3                3                3 
+  MotherPlutarch   MotherInnocent        Toussaint          Anzelma 
+               3                4                4                5 
+          Woman2   LtGillenormand           Child1           Child2 
+               5                5                5                5 
+    MmeHucheloup         Simplice       Bamatabois           Brevet 
+               7                8               11               11 
+      Chenildieu      Cochepaille     Montparnasse           Brujon 
+              11               11               12               13 
+    Fauchelevent            Judge     Champmathieu           Mabeuf 
+              14               14               14               16 
+       Grantaire   MlleBaptistine      MmeMagloire          Eponine 
+              16               17               19               19 
+       Prouvaire       Claquesous MlleGillenormand        Listolier 
+              19               20               23               24 
+         Fameuil          Zephine      Blacheville           Dahlia 
+              24               24               25               25 
+       Gueulemer        Tholomyes        Favourite            Babet 
+              25               26               26               27 
+    Gillenormand           Myriel    MmeThenardier          Feuilly 
+              29               31               34               38 
+         Bahorel             Joly          Fantine           Javert 
+              39               43               47               47 
+        Gavroche       Thenardier          Bossuet          Cosette 
+              56               61               66               68 
+      Combeferre       Courfeyrac         Enjolras           Marius 
+              68               84               91              104 
+         Valjean 
+             158  
+```
+
+### Global Clustering Coefficient (GCC)
+
+The global clustering coefficient measures the tendency of nodes in a network to cluster together. It quantifies the overall connectivity and cohesion of the network by considering all possible triplets of nodes. In essence, it indicates how much the network resembles a collection of closely connected groups (clusters). 
+
+![](week4_plot4.png)
+
+```r
+transitivity(g, "global")
+```
+The output: 
+```r
+0.4989316
+```
+Wow the network is very cohesive because GCC is between 0 and 1. 
+
+### Average path length (APL)
+Average Path Length (APL) is a key indicator of how interconnected a network is, with shorter APLs generally indicating a more efficient network. APL is calculated by finding the shortest path between all pairs of nodes in the network and then averaging those shortest path lengths. 
+### 
+
+
 
 
