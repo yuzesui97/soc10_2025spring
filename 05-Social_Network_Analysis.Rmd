@@ -289,6 +289,80 @@ Wow the network is very cohesive because GCC is between 0 and 1.
 Average Path Length (APL) is a key indicator of how interconnected a network is, with shorter APLs generally indicating a more efficient network. APL is calculated by finding the shortest path between all pairs of nodes in the network and then averaging those shortest path lengths. 
 ### 
 
+```r
+average.path.length(g,directed = FALSE)
+```
+The output is:
+```r
+4.861244
+```
+Essentially, for any two random nodes in the network, it on vargae takes 4.86 steps to reach from one node to the other node.
 
+### Betweenness centrality
+Betweenness centrality is a network analysis metric that measures the extent to which a node lies on shortest paths between other nodes in a network. It quantifies the importance of a node in connecting different parts of the network. A node with high betweenness centrality is often a "bridge" or "connector" between various nodes or groups of nodes in the network. 
 
+```r
+sort(betweenness(g, weights = NA))
+```
+```r
+        Napoleon   MlleBaptistine      MmeMagloire     CountessDeLo 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+        Geborand     Champtercier         Cravatte            Count 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+          OldMan          Labarre       Marguerite           MmeDeR 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+         Isabeau          Gervais        Listolier          Fameuil 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+     Blacheville        Favourite           Dahlia          Zephine 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+        Perpetue      Scaufflaire           Woman1            Judge 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+    Champmathieu           Brevet       Chenildieu      Cochepaille 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+    Boulatruelle          Anzelma           Woman2   MotherInnocent 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+         Gribier        Jondrette      MlleVaubois   LtGillenormand 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+       BaronessT        Prouvaire   MotherPlutarch        Toussaint 
+       0.0000000        0.0000000        0.0000000        0.0000000 
+          Child1           Child2     MmeHucheloup        Grantaire 
+       0.0000000        0.0000000        0.0000000        0.4285714 
+          Magnon     MmePontmercy           Brujon       Combeferre 
+       0.6190476        1.0000000        1.2500000        3.5629149 
+         Feuilly          Bahorel             Joly     Montparnasse 
+       3.5629149        6.2286417        6.2286417       11.0404151 
+      Claquesous        Gueulemer            Babet       Courfeyrac 
+      13.8561420       14.1370943       14.1370943       15.0110352 
+       Pontmercy       Bamatabois         Simplice          Eponine 
+      19.7375000       22.9166667       24.6248408       32.7395194 
+    Gillenormand          Cosette        MmeBurgon     Fauchelevent 
+      57.6002715       67.8193223       75.0000000       75.5000000 
+          Mabeuf    MmeThenardier          Bossuet        Tholomyes 
+      78.8345238       82.6568934       87.6479030      115.7936423 
+        Enjolras MlleGillenormand           Javert       Thenardier 
+     121.2770669      135.6569444      154.8449450      213.4684805 
+         Fantine           Marius         Gavroche           Myriel 
+     369.4869418      376.2925926      470.5706319      504.0000000 
+         Valjean 
+    1624.4688004 
+```
 
+There are many other types of centralities (eigenvector centrality, closeness centrality, degree centrality) that measure the importance of different nodes. 
+
+## Visualizing Key Measures
+Let's try to visualize some of the key measures on the network plot!
+
+For example, we can make node size proportional to degree:
+
+```r
+V(g)$size <- degree(g)
+set.seed(12)  # for reproducible layout
+plot(
+  g,
+  layout = layout_with_fr(g),
+  vertex.label.cex = 0.7,
+  vertex.size     = V(g)$size / 2,
+  edge.width      = 0.5 * E(g)$weight,  # edge widths scale with weight
+  main = "Les Misérables Character Co-appearance Network"
+)
+```
