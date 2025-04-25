@@ -33,7 +33,6 @@ We can see that there are three columns. The first two columns define the source
 In the case of co-appearence, linkages are not directional. Thus, each pair of node IDs only appear once. For a directed network, each pair of nodes could appear twice (e.g., 1 -- > 2 vs. 2 -- > 1. In the first case, 1 is the sending node and in the second case, 2 is the sending node).
 
 For the edgelist dataframe, we only report node pairs that have links. Thus the third column, which represents the intensity of the connection (i.e., edge weight), is never zero. The "weight" column could have varied values if the network is weighted. The Les Miserables network is weighted that weights represent the number of co-occurence. For some networks, egdes are not weighted (i.e., weight column = 1 for all rows). For such unweighted networks, we could omit the "weight" column. 
-
 Besides the edgelist data, when conducting social network analysis in R, we often have a second dataframe that stores node-level attributes (though it is not required to have this node-level dataframe to conduct network analysis in R). For the Les Miserables network, we have node-level attributes that store the actual charater names that the nodes correspond to and whether the character is a key character in the novel. 
 
 ```r
