@@ -31,7 +31,7 @@
   
   
 <link rel="prev" href="regression-and-classification.html"/>
-<link rel="next" href="extensions.html"/>
+
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -175,13 +175,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.3.2" data-path="social-network-analysis.html"><a href="social-network-analysis.html#weighted-degree-strength"><i class="fa fa-check"></i><b>4.3.2</b> Weighted degree (strength)</a></li>
 <li class="chapter" data-level="4.3.3" data-path="social-network-analysis.html"><a href="social-network-analysis.html#global-clustering-coefficient-gcc"><i class="fa fa-check"></i><b>4.3.3</b> Global Clustering Coefficient (GCC)</a></li>
 <li class="chapter" data-level="4.3.4" data-path="social-network-analysis.html"><a href="social-network-analysis.html#average-path-length-apl"><i class="fa fa-check"></i><b>4.3.4</b> Average path length (APL)</a></li>
-<li class="chapter" data-level="4.3.5" data-path="social-network-analysis.html"><a href="social-network-analysis.html#betweenness-centrality"><i class="fa fa-check"></i><b>4.3.5</b> Betweenness centrality</a></li>
+<li class="chapter" data-level="4.3.5" data-path="social-network-analysis.html"><a href="social-network-analysis.html#assortativity"><i class="fa fa-check"></i><b>4.3.5</b> Assortativity</a></li>
+<li class="chapter" data-level="4.3.6" data-path="social-network-analysis.html"><a href="social-network-analysis.html#betweenness-centrality"><i class="fa fa-check"></i><b>4.3.6</b> Betweenness centrality</a></li>
 </ul></li>
 <li class="chapter" data-level="4.4" data-path="social-network-analysis.html"><a href="social-network-analysis.html#visualizing-key-measures"><i class="fa fa-check"></i><b>4.4</b> Visualizing Key Measures</a></li>
 <li class="chapter" data-level="4.5" data-path="social-network-analysis.html"><a href="social-network-analysis.html#benchmark-our-empirical-network"><i class="fa fa-check"></i><b>4.5</b> Benchmark our empirical network</a></li>
 <li class="chapter" data-level="4.6" data-path="social-network-analysis.html"><a href="social-network-analysis.html#find-local-clusterscommunities"><i class="fa fa-check"></i><b>4.6</b> Find local clusters/communities</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="extensions.html"><a href="extensions.html"><i class="fa fa-check"></i><b>5</b> Extensions</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 </ul>
@@ -221,8 +221,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb66-7"><a href="social-network-analysis.html#cb66-7" tabindex="-1"></a><span class="dv">6</span>      <span class="dv">1</span>      <span class="dv">7</span>      <span class="dv">1</span></span></code></pre></div>
 <p>We can see that there are three columns. The first two columns define the source and the target of the connection. The numerical values in these two columns represent different network nodes (here they represent individual characters in the novel). They do not have to be numerical IDs and we could put in actual character names instead, which is more readable but take up more storage space on our disk.</p>
 <p>In the case of co-appearence, linkages are not directional. Thus, each pair of node IDs only appear once. For a directed network, each pair of nodes could appear twice (e.g., 1 – &gt; 2 vs. 2 – &gt; 1. In the first case, 1 is the sending node and in the second case, 2 is the sending node).</p>
-<p>For the edgelist dataframe, we only report node pairs that have links. Thus the third column, which represents the intensity of the connection (i.e., edge weight), is never zero. The “weight” column could have varied values if the network is weighted. The Les Miserables network is weighted that weights represent the number of co-occurence. For some networks, egdes are not weighted (i.e., weight column = 1 for all rows). For such unweighted networks, we could omit the “weight” column.</p>
-<p>Besides the edgelist data, when conducting social network analysis in R, we often have a second dataframe that stores node-level attributes (though it is not required to have this node-level dataframe to conduct network analysis in R). For the Les Miserables network, we have node-level attributes that store the actual charater names that the nodes correspond to and whether the character is a key character in the novel.</p>
+<p>For the edgelist dataframe, we only report node pairs that have links. Thus the third column, which represents the intensity of the connection (i.e., edge weight), is never zero. The “weight” column could have varied values if the network is weighted. The Les Miserables network is weighted that weights represent the number of co-occurence. For some networks, egdes are not weighted (i.e., weight column = 1 for all rows). For such unweighted networks, we could omit the “weight” column.
+Besides the edgelist data, when conducting social network analysis in R, we often have a second dataframe that stores node-level attributes (though it is not required to have this node-level dataframe to conduct network analysis in R). For the Les Miserables network, we have node-level attributes that store the actual charater names that the nodes correspond to and whether the character is a key character in the novel.</p>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="social-network-analysis.html#cb67-1" tabindex="-1"></a>nodes  <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;lesmis_nodes.csv&quot;</span>)</span></code></pre></div>
 <p>Let’s take a look at this dataframe using function head():</p>
 <div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="social-network-analysis.html#cb68-1" tabindex="-1"></a><span class="fu">head</span>(nodes)</span></code></pre></div>
@@ -421,50 +421,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="social-network-analysis.html#cb86-1" tabindex="-1"></a><span class="fl">4.861244</span></span></code></pre></div>
 <p>Essentially, for any two random nodes in the network, it on vargae takes 4.86 steps to reach from one node to the other node.</p>
 </div>
-<div id="betweenness-centrality" class="section level3 hasAnchor" number="4.3.5">
-<h3><span class="header-section-number">4.3.5</span> Betweenness centrality<a href="social-network-analysis.html#betweenness-centrality" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="assortativity" class="section level3 hasAnchor" number="4.3.5">
+<h3><span class="header-section-number">4.3.5</span> Assortativity<a href="social-network-analysis.html#assortativity" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The assortativity coefficient is positive is similar vertices (based on some external property) tend to connect to each, and negative otherwise. Just like the concept of homophoily!</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="social-network-analysis.html#cb87-1" tabindex="-1"></a><span class="fu">assortativity</span>(g, <span class="fu">as.factor</span>(<span class="fu">V</span>(g)<span class="sc">$</span>key_character), <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p>The output is:</p>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="social-network-analysis.html#cb88-1" tabindex="-1"></a><span class="sc">-</span><span class="fl">0.08629372</span></span></code></pre></div>
+<p>Essentially, main characters engage with supporting characters!</p>
+</div>
+<div id="betweenness-centrality" class="section level3 hasAnchor" number="4.3.6">
+<h3><span class="header-section-number">4.3.6</span> Betweenness centrality<a href="social-network-analysis.html#betweenness-centrality" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Betweenness centrality is a network analysis metric that measures the extent to which a node lies on shortest paths between other nodes in a network. It quantifies the importance of a node in connecting different parts of the network. A node with high betweenness centrality is often a “bridge” or “connector” between various nodes or groups of nodes in the network.</p>
-<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="social-network-analysis.html#cb87-1" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">betweenness</span>(g, <span class="at">weights =</span> <span class="cn">NA</span>))</span></code></pre></div>
-<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="social-network-analysis.html#cb88-1" tabindex="-1"></a>        Napoleon   MlleBaptistine      MmeMagloire     CountessDeLo </span>
-<span id="cb88-2"><a href="social-network-analysis.html#cb88-2" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-3"><a href="social-network-analysis.html#cb88-3" tabindex="-1"></a>        Geborand     Champtercier         Cravatte            Count </span>
-<span id="cb88-4"><a href="social-network-analysis.html#cb88-4" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-5"><a href="social-network-analysis.html#cb88-5" tabindex="-1"></a>          OldMan          Labarre       Marguerite           MmeDeR </span>
-<span id="cb88-6"><a href="social-network-analysis.html#cb88-6" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-7"><a href="social-network-analysis.html#cb88-7" tabindex="-1"></a>         Isabeau          Gervais        Listolier          Fameuil </span>
-<span id="cb88-8"><a href="social-network-analysis.html#cb88-8" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-9"><a href="social-network-analysis.html#cb88-9" tabindex="-1"></a>     Blacheville        Favourite           Dahlia          Zephine </span>
-<span id="cb88-10"><a href="social-network-analysis.html#cb88-10" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-11"><a href="social-network-analysis.html#cb88-11" tabindex="-1"></a>        Perpetue      Scaufflaire           Woman1            Judge </span>
-<span id="cb88-12"><a href="social-network-analysis.html#cb88-12" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-13"><a href="social-network-analysis.html#cb88-13" tabindex="-1"></a>    Champmathieu           Brevet       Chenildieu      Cochepaille </span>
-<span id="cb88-14"><a href="social-network-analysis.html#cb88-14" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-15"><a href="social-network-analysis.html#cb88-15" tabindex="-1"></a>    Boulatruelle          Anzelma           Woman2   MotherInnocent </span>
-<span id="cb88-16"><a href="social-network-analysis.html#cb88-16" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-17"><a href="social-network-analysis.html#cb88-17" tabindex="-1"></a>         Gribier        Jondrette      MlleVaubois   LtGillenormand </span>
-<span id="cb88-18"><a href="social-network-analysis.html#cb88-18" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-19"><a href="social-network-analysis.html#cb88-19" tabindex="-1"></a>       BaronessT        Prouvaire   MotherPlutarch        Toussaint </span>
-<span id="cb88-20"><a href="social-network-analysis.html#cb88-20" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
-<span id="cb88-21"><a href="social-network-analysis.html#cb88-21" tabindex="-1"></a>          Child1           Child2     MmeHucheloup        Grantaire </span>
-<span id="cb88-22"><a href="social-network-analysis.html#cb88-22" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.4285714</span> </span>
-<span id="cb88-23"><a href="social-network-analysis.html#cb88-23" tabindex="-1"></a>          Magnon     MmePontmercy           Brujon       Combeferre </span>
-<span id="cb88-24"><a href="social-network-analysis.html#cb88-24" tabindex="-1"></a>       <span class="fl">0.6190476</span>        <span class="fl">1.0000000</span>        <span class="fl">1.2500000</span>        <span class="fl">3.5629149</span> </span>
-<span id="cb88-25"><a href="social-network-analysis.html#cb88-25" tabindex="-1"></a>         Feuilly          Bahorel             Joly     Montparnasse </span>
-<span id="cb88-26"><a href="social-network-analysis.html#cb88-26" tabindex="-1"></a>       <span class="fl">3.5629149</span>        <span class="fl">6.2286417</span>        <span class="fl">6.2286417</span>       <span class="fl">11.0404151</span> </span>
-<span id="cb88-27"><a href="social-network-analysis.html#cb88-27" tabindex="-1"></a>      Claquesous        Gueulemer            Babet       Courfeyrac </span>
-<span id="cb88-28"><a href="social-network-analysis.html#cb88-28" tabindex="-1"></a>      <span class="fl">13.8561420</span>       <span class="fl">14.1370943</span>       <span class="fl">14.1370943</span>       <span class="fl">15.0110352</span> </span>
-<span id="cb88-29"><a href="social-network-analysis.html#cb88-29" tabindex="-1"></a>       Pontmercy       Bamatabois         Simplice          Eponine </span>
-<span id="cb88-30"><a href="social-network-analysis.html#cb88-30" tabindex="-1"></a>      <span class="fl">19.7375000</span>       <span class="fl">22.9166667</span>       <span class="fl">24.6248408</span>       <span class="fl">32.7395194</span> </span>
-<span id="cb88-31"><a href="social-network-analysis.html#cb88-31" tabindex="-1"></a>    Gillenormand          Cosette        MmeBurgon     Fauchelevent </span>
-<span id="cb88-32"><a href="social-network-analysis.html#cb88-32" tabindex="-1"></a>      <span class="fl">57.6002715</span>       <span class="fl">67.8193223</span>       <span class="fl">75.0000000</span>       <span class="fl">75.5000000</span> </span>
-<span id="cb88-33"><a href="social-network-analysis.html#cb88-33" tabindex="-1"></a>          Mabeuf    MmeThenardier          Bossuet        Tholomyes </span>
-<span id="cb88-34"><a href="social-network-analysis.html#cb88-34" tabindex="-1"></a>      <span class="fl">78.8345238</span>       <span class="fl">82.6568934</span>       <span class="fl">87.6479030</span>      <span class="fl">115.7936423</span> </span>
-<span id="cb88-35"><a href="social-network-analysis.html#cb88-35" tabindex="-1"></a>        Enjolras MlleGillenormand           Javert       Thenardier </span>
-<span id="cb88-36"><a href="social-network-analysis.html#cb88-36" tabindex="-1"></a>     <span class="fl">121.2770669</span>      <span class="fl">135.6569444</span>      <span class="fl">154.8449450</span>      <span class="fl">213.4684805</span> </span>
-<span id="cb88-37"><a href="social-network-analysis.html#cb88-37" tabindex="-1"></a>         Fantine           Marius         Gavroche           Myriel </span>
-<span id="cb88-38"><a href="social-network-analysis.html#cb88-38" tabindex="-1"></a>     <span class="fl">369.4869418</span>      <span class="fl">376.2925926</span>      <span class="fl">470.5706319</span>      <span class="fl">504.0000000</span> </span>
-<span id="cb88-39"><a href="social-network-analysis.html#cb88-39" tabindex="-1"></a>         Valjean </span>
-<span id="cb88-40"><a href="social-network-analysis.html#cb88-40" tabindex="-1"></a>    <span class="fl">1624.4688004</span> </span></code></pre></div>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="social-network-analysis.html#cb89-1" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">betweenness</span>(g, <span class="at">weights =</span> <span class="cn">NA</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="social-network-analysis.html#cb90-1" tabindex="-1"></a>        Napoleon   MlleBaptistine      MmeMagloire     CountessDeLo </span>
+<span id="cb90-2"><a href="social-network-analysis.html#cb90-2" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-3"><a href="social-network-analysis.html#cb90-3" tabindex="-1"></a>        Geborand     Champtercier         Cravatte            Count </span>
+<span id="cb90-4"><a href="social-network-analysis.html#cb90-4" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-5"><a href="social-network-analysis.html#cb90-5" tabindex="-1"></a>          OldMan          Labarre       Marguerite           MmeDeR </span>
+<span id="cb90-6"><a href="social-network-analysis.html#cb90-6" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-7"><a href="social-network-analysis.html#cb90-7" tabindex="-1"></a>         Isabeau          Gervais        Listolier          Fameuil </span>
+<span id="cb90-8"><a href="social-network-analysis.html#cb90-8" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-9"><a href="social-network-analysis.html#cb90-9" tabindex="-1"></a>     Blacheville        Favourite           Dahlia          Zephine </span>
+<span id="cb90-10"><a href="social-network-analysis.html#cb90-10" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-11"><a href="social-network-analysis.html#cb90-11" tabindex="-1"></a>        Perpetue      Scaufflaire           Woman1            Judge </span>
+<span id="cb90-12"><a href="social-network-analysis.html#cb90-12" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-13"><a href="social-network-analysis.html#cb90-13" tabindex="-1"></a>    Champmathieu           Brevet       Chenildieu      Cochepaille </span>
+<span id="cb90-14"><a href="social-network-analysis.html#cb90-14" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-15"><a href="social-network-analysis.html#cb90-15" tabindex="-1"></a>    Boulatruelle          Anzelma           Woman2   MotherInnocent </span>
+<span id="cb90-16"><a href="social-network-analysis.html#cb90-16" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-17"><a href="social-network-analysis.html#cb90-17" tabindex="-1"></a>         Gribier        Jondrette      MlleVaubois   LtGillenormand </span>
+<span id="cb90-18"><a href="social-network-analysis.html#cb90-18" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-19"><a href="social-network-analysis.html#cb90-19" tabindex="-1"></a>       BaronessT        Prouvaire   MotherPlutarch        Toussaint </span>
+<span id="cb90-20"><a href="social-network-analysis.html#cb90-20" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span> </span>
+<span id="cb90-21"><a href="social-network-analysis.html#cb90-21" tabindex="-1"></a>          Child1           Child2     MmeHucheloup        Grantaire </span>
+<span id="cb90-22"><a href="social-network-analysis.html#cb90-22" tabindex="-1"></a>       <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.0000000</span>        <span class="fl">0.4285714</span> </span>
+<span id="cb90-23"><a href="social-network-analysis.html#cb90-23" tabindex="-1"></a>          Magnon     MmePontmercy           Brujon       Combeferre </span>
+<span id="cb90-24"><a href="social-network-analysis.html#cb90-24" tabindex="-1"></a>       <span class="fl">0.6190476</span>        <span class="fl">1.0000000</span>        <span class="fl">1.2500000</span>        <span class="fl">3.5629149</span> </span>
+<span id="cb90-25"><a href="social-network-analysis.html#cb90-25" tabindex="-1"></a>         Feuilly          Bahorel             Joly     Montparnasse </span>
+<span id="cb90-26"><a href="social-network-analysis.html#cb90-26" tabindex="-1"></a>       <span class="fl">3.5629149</span>        <span class="fl">6.2286417</span>        <span class="fl">6.2286417</span>       <span class="fl">11.0404151</span> </span>
+<span id="cb90-27"><a href="social-network-analysis.html#cb90-27" tabindex="-1"></a>      Claquesous        Gueulemer            Babet       Courfeyrac </span>
+<span id="cb90-28"><a href="social-network-analysis.html#cb90-28" tabindex="-1"></a>      <span class="fl">13.8561420</span>       <span class="fl">14.1370943</span>       <span class="fl">14.1370943</span>       <span class="fl">15.0110352</span> </span>
+<span id="cb90-29"><a href="social-network-analysis.html#cb90-29" tabindex="-1"></a>       Pontmercy       Bamatabois         Simplice          Eponine </span>
+<span id="cb90-30"><a href="social-network-analysis.html#cb90-30" tabindex="-1"></a>      <span class="fl">19.7375000</span>       <span class="fl">22.9166667</span>       <span class="fl">24.6248408</span>       <span class="fl">32.7395194</span> </span>
+<span id="cb90-31"><a href="social-network-analysis.html#cb90-31" tabindex="-1"></a>    Gillenormand          Cosette        MmeBurgon     Fauchelevent </span>
+<span id="cb90-32"><a href="social-network-analysis.html#cb90-32" tabindex="-1"></a>      <span class="fl">57.6002715</span>       <span class="fl">67.8193223</span>       <span class="fl">75.0000000</span>       <span class="fl">75.5000000</span> </span>
+<span id="cb90-33"><a href="social-network-analysis.html#cb90-33" tabindex="-1"></a>          Mabeuf    MmeThenardier          Bossuet        Tholomyes </span>
+<span id="cb90-34"><a href="social-network-analysis.html#cb90-34" tabindex="-1"></a>      <span class="fl">78.8345238</span>       <span class="fl">82.6568934</span>       <span class="fl">87.6479030</span>      <span class="fl">115.7936423</span> </span>
+<span id="cb90-35"><a href="social-network-analysis.html#cb90-35" tabindex="-1"></a>        Enjolras MlleGillenormand           Javert       Thenardier </span>
+<span id="cb90-36"><a href="social-network-analysis.html#cb90-36" tabindex="-1"></a>     <span class="fl">121.2770669</span>      <span class="fl">135.6569444</span>      <span class="fl">154.8449450</span>      <span class="fl">213.4684805</span> </span>
+<span id="cb90-37"><a href="social-network-analysis.html#cb90-37" tabindex="-1"></a>         Fantine           Marius         Gavroche           Myriel </span>
+<span id="cb90-38"><a href="social-network-analysis.html#cb90-38" tabindex="-1"></a>     <span class="fl">369.4869418</span>      <span class="fl">376.2925926</span>      <span class="fl">470.5706319</span>      <span class="fl">504.0000000</span> </span>
+<span id="cb90-39"><a href="social-network-analysis.html#cb90-39" tabindex="-1"></a>         Valjean </span>
+<span id="cb90-40"><a href="social-network-analysis.html#cb90-40" tabindex="-1"></a>    <span class="fl">1624.4688004</span> </span></code></pre></div>
 <p>There are many other types of centralities (eigenvector centrality, closeness centrality, degree centrality) that measure the importance of different nodes.</p>
 </div>
 </div>
@@ -472,50 +480,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">4.4</span> Visualizing Key Measures<a href="social-network-analysis.html#visualizing-key-measures" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Let’s try to visualize some of the key measures on the network plot!</p>
 <p>For example, we can make node size proportional to degree:</p>
-<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="social-network-analysis.html#cb89-1" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>size <span class="ot">&lt;-</span> <span class="fu">degree</span>(g)</span>
-<span id="cb89-2"><a href="social-network-analysis.html#cb89-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)  <span class="co"># for reproducible layout</span></span>
-<span id="cb89-3"><a href="social-network-analysis.html#cb89-3" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb89-4"><a href="social-network-analysis.html#cb89-4" tabindex="-1"></a>  g,</span>
-<span id="cb89-5"><a href="social-network-analysis.html#cb89-5" tabindex="-1"></a>  <span class="at">layout =</span> <span class="fu">layout_with_fr</span>(g),</span>
-<span id="cb89-6"><a href="social-network-analysis.html#cb89-6" tabindex="-1"></a>  <span class="at">vertex.label.cex =</span> <span class="fl">0.7</span>,</span>
-<span id="cb89-7"><a href="social-network-analysis.html#cb89-7" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="fu">V</span>(g)<span class="sc">$</span>size <span class="sc">/</span> <span class="dv">2</span>,</span>
-<span id="cb89-8"><a href="social-network-analysis.html#cb89-8" tabindex="-1"></a>  <span class="at">edge.width      =</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight,  <span class="co"># edge widths scale with weight</span></span>
-<span id="cb89-9"><a href="social-network-analysis.html#cb89-9" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Les Misérables Character Co-appearance Network&quot;</span></span>
-<span id="cb89-10"><a href="social-network-analysis.html#cb89-10" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="social-network-analysis.html#cb91-1" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>size <span class="ot">&lt;-</span> <span class="fu">degree</span>(g)</span>
+<span id="cb91-2"><a href="social-network-analysis.html#cb91-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)  <span class="co"># for reproducible layout</span></span>
+<span id="cb91-3"><a href="social-network-analysis.html#cb91-3" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb91-4"><a href="social-network-analysis.html#cb91-4" tabindex="-1"></a>  g,</span>
+<span id="cb91-5"><a href="social-network-analysis.html#cb91-5" tabindex="-1"></a>  <span class="at">layout =</span> <span class="fu">layout_with_fr</span>(g),</span>
+<span id="cb91-6"><a href="social-network-analysis.html#cb91-6" tabindex="-1"></a>  <span class="at">vertex.label.cex =</span> <span class="fl">0.7</span>,</span>
+<span id="cb91-7"><a href="social-network-analysis.html#cb91-7" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="fu">V</span>(g)<span class="sc">$</span>size <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb91-8"><a href="social-network-analysis.html#cb91-8" tabindex="-1"></a>  <span class="at">edge.width      =</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight,  <span class="co"># edge widths scale with weight</span></span>
+<span id="cb91-9"><a href="social-network-analysis.html#cb91-9" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Les Misérables Character Co-appearance Network&quot;</span></span>
+<span id="cb91-10"><a href="social-network-analysis.html#cb91-10" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="week4_degree.png" /></p>
 <p>For example, we can make node size proportional to betweenness centrality measure:</p>
-<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="social-network-analysis.html#cb90-1" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>size <span class="ot">&lt;-</span> <span class="fu">betweenness</span>(g, <span class="at">weights =</span> <span class="cn">NA</span>)</span>
-<span id="cb90-2"><a href="social-network-analysis.html#cb90-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)  <span class="co"># for reproducible layout</span></span>
-<span id="cb90-3"><a href="social-network-analysis.html#cb90-3" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb90-4"><a href="social-network-analysis.html#cb90-4" tabindex="-1"></a>  g,</span>
-<span id="cb90-5"><a href="social-network-analysis.html#cb90-5" tabindex="-1"></a>  <span class="at">layout =</span> <span class="fu">layout_with_fr</span>(g),</span>
-<span id="cb90-6"><a href="social-network-analysis.html#cb90-6" tabindex="-1"></a>  <span class="at">vertex.label.cex =</span> <span class="fl">0.7</span>,</span>
-<span id="cb90-7"><a href="social-network-analysis.html#cb90-7" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="fu">V</span>(g)<span class="sc">$</span>size <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb90-8"><a href="social-network-analysis.html#cb90-8" tabindex="-1"></a>  <span class="at">edge.width      =</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight,  <span class="co"># edge widths scale with weight</span></span>
-<span id="cb90-9"><a href="social-network-analysis.html#cb90-9" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Les Misérables Character Co-appearance Network&quot;</span></span>
-<span id="cb90-10"><a href="social-network-analysis.html#cb90-10" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="social-network-analysis.html#cb92-1" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>size <span class="ot">&lt;-</span> <span class="fu">betweenness</span>(g, <span class="at">weights =</span> <span class="cn">NA</span>)</span>
+<span id="cb92-2"><a href="social-network-analysis.html#cb92-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)  <span class="co"># for reproducible layout</span></span>
+<span id="cb92-3"><a href="social-network-analysis.html#cb92-3" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb92-4"><a href="social-network-analysis.html#cb92-4" tabindex="-1"></a>  g,</span>
+<span id="cb92-5"><a href="social-network-analysis.html#cb92-5" tabindex="-1"></a>  <span class="at">layout =</span> <span class="fu">layout_with_fr</span>(g),</span>
+<span id="cb92-6"><a href="social-network-analysis.html#cb92-6" tabindex="-1"></a>  <span class="at">vertex.label.cex =</span> <span class="fl">0.7</span>,</span>
+<span id="cb92-7"><a href="social-network-analysis.html#cb92-7" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="fu">V</span>(g)<span class="sc">$</span>size <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb92-8"><a href="social-network-analysis.html#cb92-8" tabindex="-1"></a>  <span class="at">edge.width      =</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight,  <span class="co"># edge widths scale with weight</span></span>
+<span id="cb92-9"><a href="social-network-analysis.html#cb92-9" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Les Misérables Character Co-appearance Network&quot;</span></span>
+<span id="cb92-10"><a href="social-network-analysis.html#cb92-10" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="week4_between.png" /></p>
 </div>
 <div id="benchmark-our-empirical-network" class="section level2 hasAnchor" number="4.5">
 <h2><span class="header-section-number">4.5</span> Benchmark our empirical network<a href="social-network-analysis.html#benchmark-our-empirical-network" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>I just introduced the measure of GCC and APL. You may wonder, for our empirical network, is the GCC/APL high or low? We often need to benchmark it to a random graph to answer this question.</p>
 <p>A random graph (also known as Erdős–Rényi random graph) preseves the same number of nodes and edges for an empirical network. However, the edges are randomly conencted for the random network.</p>
-<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="social-network-analysis.html#cb91-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb91-2"><a href="social-network-analysis.html#cb91-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">vcount</span>(g)</span>
-<span id="cb91-3"><a href="social-network-analysis.html#cb91-3" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">ecount</span>(g)</span>
-<span id="cb91-4"><a href="social-network-analysis.html#cb91-4" tabindex="-1"></a>g_r <span class="ot">&lt;-</span> <span class="fu">sample_gnm</span>(n, m, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">loops =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb91-5"><a href="social-network-analysis.html#cb91-5" tabindex="-1"></a>gcc_rand <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(g_r, <span class="at">type =</span> <span class="st">&quot;global&quot;</span>)</span>
-<span id="cb91-6"><a href="social-network-analysis.html#cb91-6" tabindex="-1"></a>apl_rand <span class="ot">&lt;-</span> <span class="fu">average.path.length</span>(g_r, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="social-network-analysis.html#cb93-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb93-2"><a href="social-network-analysis.html#cb93-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">vcount</span>(g)</span>
+<span id="cb93-3"><a href="social-network-analysis.html#cb93-3" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">ecount</span>(g)</span>
+<span id="cb93-4"><a href="social-network-analysis.html#cb93-4" tabindex="-1"></a>g_r <span class="ot">&lt;-</span> <span class="fu">sample_gnm</span>(n, m, <span class="at">directed =</span> <span class="cn">FALSE</span>, <span class="at">loops =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb93-5"><a href="social-network-analysis.html#cb93-5" tabindex="-1"></a>gcc_rand <span class="ot">&lt;-</span> <span class="fu">transitivity</span>(g_r, <span class="at">type =</span> <span class="st">&quot;global&quot;</span>)</span>
+<span id="cb93-6"><a href="social-network-analysis.html#cb93-6" tabindex="-1"></a>apl_rand <span class="ot">&lt;-</span> <span class="fu">average.path.length</span>(g_r, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>The GCC for the random network is only 0.0745003 and the APL is 2.471634. What is the implication? The random network is less locally clustered but more globally connected!</p>
-<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="social-network-analysis.html#cb92-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)  <span class="co"># for reproducible layout</span></span>
-<span id="cb92-2"><a href="social-network-analysis.html#cb92-2" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb92-3"><a href="social-network-analysis.html#cb92-3" tabindex="-1"></a>  g_r,</span>
-<span id="cb92-4"><a href="social-network-analysis.html#cb92-4" tabindex="-1"></a>  <span class="at">layout =</span> <span class="fu">layout_with_fr</span>(g_r),</span>
-<span id="cb92-5"><a href="social-network-analysis.html#cb92-5" tabindex="-1"></a>  <span class="at">vertex.label =</span> <span class="cn">NA</span>,</span>
-<span id="cb92-6"><a href="social-network-analysis.html#cb92-6" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="dv">5</span>,</span>
-<span id="cb92-7"><a href="social-network-analysis.html#cb92-7" tabindex="-1"></a>  <span class="at">edge.width      =</span> <span class="dv">1</span>,  </span>
-<span id="cb92-8"><a href="social-network-analysis.html#cb92-8" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Random Network&quot;</span></span>
-<span id="cb92-9"><a href="social-network-analysis.html#cb92-9" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="social-network-analysis.html#cb94-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)  <span class="co"># for reproducible layout</span></span>
+<span id="cb94-2"><a href="social-network-analysis.html#cb94-2" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb94-3"><a href="social-network-analysis.html#cb94-3" tabindex="-1"></a>  g_r,</span>
+<span id="cb94-4"><a href="social-network-analysis.html#cb94-4" tabindex="-1"></a>  <span class="at">layout =</span> <span class="fu">layout_with_fr</span>(g_r),</span>
+<span id="cb94-5"><a href="social-network-analysis.html#cb94-5" tabindex="-1"></a>  <span class="at">vertex.label =</span> <span class="cn">NA</span>,</span>
+<span id="cb94-6"><a href="social-network-analysis.html#cb94-6" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="dv">5</span>,</span>
+<span id="cb94-7"><a href="social-network-analysis.html#cb94-7" tabindex="-1"></a>  <span class="at">edge.width      =</span> <span class="dv">1</span>,  </span>
+<span id="cb94-8"><a href="social-network-analysis.html#cb94-8" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Random Network&quot;</span></span>
+<span id="cb94-9"><a href="social-network-analysis.html#cb94-9" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="week4_random.png" /></p>
 <p>Can we have both high GCC and low APL? Yes! The small-world network!</p>
 <p><img src="week4_small_world.png" /></p>
@@ -523,26 +531,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="find-local-clusterscommunities" class="section level2 hasAnchor" number="4.6">
 <h2><span class="header-section-number">4.6</span> Find local clusters/communities<a href="social-network-analysis.html#find-local-clusterscommunities" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>There are multiple community detection methods. louvain is a popular one and it works for weighted network.</p>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="social-network-analysis.html#cb93-1" tabindex="-1"></a>Community <span class="fu">detection</span> (weighted Louvain)</span>
-<span id="cb93-2"><a href="social-network-analysis.html#cb93-2" tabindex="-1"></a>com <span class="ot">&lt;-</span> <span class="fu">cluster_louvain</span>(g, <span class="at">weights =</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight)</span>
-<span id="cb93-3"><a href="social-network-analysis.html#cb93-3" tabindex="-1"></a></span>
-<span id="cb93-4"><a href="social-network-analysis.html#cb93-4" tabindex="-1"></a><span class="co"># &quot;Number of communities found&quot;</span></span>
-<span id="cb93-5"><a href="social-network-analysis.html#cb93-5" tabindex="-1"></a><span class="fu">length</span>(com)</span></code></pre></div>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="social-network-analysis.html#cb94-1" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>community <span class="ot">&lt;-</span> <span class="fu">membership</span>(com)</span>
-<span id="cb94-2"><a href="social-network-analysis.html#cb94-2" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>color <span class="ot">&lt;-</span> <span class="fu">V</span>(g)<span class="sc">$</span>community</span>
-<span id="cb94-3"><a href="social-network-analysis.html#cb94-3" tabindex="-1"></a></span>
-<span id="cb94-4"><a href="social-network-analysis.html#cb94-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)</span>
-<span id="cb94-5"><a href="social-network-analysis.html#cb94-5" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb94-6"><a href="social-network-analysis.html#cb94-6" tabindex="-1"></a>  g,</span>
-<span id="cb94-7"><a href="social-network-analysis.html#cb94-7" tabindex="-1"></a>  <span class="at">layout            =</span> <span class="fu">layout_with_fr</span>(g),</span>
-<span id="cb94-8"><a href="social-network-analysis.html#cb94-8" tabindex="-1"></a>  <span class="at">vertex.label.cex  =</span> <span class="fl">0.7</span>,</span>
-<span id="cb94-9"><a href="social-network-analysis.html#cb94-9" tabindex="-1"></a>  <span class="at">vertex.label.color=</span> <span class="st">&quot;black&quot;</span>,</span>
-<span id="cb94-10"><a href="social-network-analysis.html#cb94-10" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="dv">5</span>,</span>
-<span id="cb94-11"><a href="social-network-analysis.html#cb94-11" tabindex="-1"></a>  <span class="at">vertex.color=</span> <span class="fu">V</span>(g)<span class="sc">$</span>color,</span>
-<span id="cb94-12"><a href="social-network-analysis.html#cb94-12" tabindex="-1"></a>  <span class="at">edge.width        =</span>  <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight,</span>
-<span id="cb94-13"><a href="social-network-analysis.html#cb94-13" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Les Misérables – Louvain Communities&quot;</span></span>
-<span id="cb94-14"><a href="social-network-analysis.html#cb94-14" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="social-network-analysis.html#cb95-1" tabindex="-1"></a>Community <span class="fu">detection</span> (weighted Louvain)</span>
+<span id="cb95-2"><a href="social-network-analysis.html#cb95-2" tabindex="-1"></a>com <span class="ot">&lt;-</span> <span class="fu">cluster_louvain</span>(g, <span class="at">weights =</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight)</span>
+<span id="cb95-3"><a href="social-network-analysis.html#cb95-3" tabindex="-1"></a></span>
+<span id="cb95-4"><a href="social-network-analysis.html#cb95-4" tabindex="-1"></a><span class="co"># &quot;Number of communities found&quot;</span></span>
+<span id="cb95-5"><a href="social-network-analysis.html#cb95-5" tabindex="-1"></a><span class="fu">length</span>(com)</span></code></pre></div>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="social-network-analysis.html#cb96-1" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>community <span class="ot">&lt;-</span> <span class="fu">membership</span>(com)</span>
+<span id="cb96-2"><a href="social-network-analysis.html#cb96-2" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>color <span class="ot">&lt;-</span> <span class="fu">V</span>(g)<span class="sc">$</span>community</span>
+<span id="cb96-3"><a href="social-network-analysis.html#cb96-3" tabindex="-1"></a></span>
+<span id="cb96-4"><a href="social-network-analysis.html#cb96-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)</span>
+<span id="cb96-5"><a href="social-network-analysis.html#cb96-5" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb96-6"><a href="social-network-analysis.html#cb96-6" tabindex="-1"></a>  g,</span>
+<span id="cb96-7"><a href="social-network-analysis.html#cb96-7" tabindex="-1"></a>  <span class="at">layout            =</span> <span class="fu">layout_with_fr</span>(g),</span>
+<span id="cb96-8"><a href="social-network-analysis.html#cb96-8" tabindex="-1"></a>  <span class="at">vertex.label.cex  =</span> <span class="fl">0.7</span>,</span>
+<span id="cb96-9"><a href="social-network-analysis.html#cb96-9" tabindex="-1"></a>  <span class="at">vertex.label.color=</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb96-10"><a href="social-network-analysis.html#cb96-10" tabindex="-1"></a>  <span class="at">vertex.size     =</span> <span class="dv">5</span>,</span>
+<span id="cb96-11"><a href="social-network-analysis.html#cb96-11" tabindex="-1"></a>  <span class="at">vertex.color=</span> <span class="fu">V</span>(g)<span class="sc">$</span>color,</span>
+<span id="cb96-12"><a href="social-network-analysis.html#cb96-12" tabindex="-1"></a>  <span class="at">edge.width        =</span>  <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">E</span>(g)<span class="sc">$</span>weight,</span>
+<span id="cb96-13"><a href="social-network-analysis.html#cb96-13" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Les Misérables – Louvain Communities&quot;</span></span>
+<span id="cb96-14"><a href="social-network-analysis.html#cb96-14" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="week4_community.png" /></p>
+<p>##Other Resources
+Social network analysis is a powerful tool and there are much more could be done to our data! Check out <a href="https://r.igraph.org/" class="uri">https://r.igraph.org/</a> for more network analysis techniques using R.</p>
+<p>If you are interested in social network datasets, check out <a href="https://icon.colorado.edu/networks" class="uri">https://icon.colorado.edu/networks</a></p>
+<p>Also check out this awesome interactive social network page on “Six Degrees of Francis Bacon”: <a href="http://sixdegreesoffrancisbacon.com/?ids=10000473&amp;min_confidence=60&amp;type=network" class="uri">http://sixdegreesoffrancisbacon.com/?ids=10000473&amp;min_confidence=60&amp;type=network</a></p>
+
 </div>
 </div>
             </section>
@@ -550,8 +563,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="regression-and-classification.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="extensions.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="regression-and-classification.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

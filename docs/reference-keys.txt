@@ -24,8 +24,8 @@ degree-how-many-friends-do-i-have
 weighted-degree-strength
 global-clustering-coefficient-gcc
 average-path-length-apl
+assortativity
 betweenness-centrality
 visualizing-key-measures
 benchmark-our-empirical-network
 find-local-clusterscommunities
-extensions
