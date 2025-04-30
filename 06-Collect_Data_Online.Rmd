@@ -1,4 +1,4 @@
-# Collecting data online
+# Collecting Data Online
 
 *This section is drafted based on Dr. Mark Hoffman's previous SOC 10 lab notes.*
 *Conducting research via webpage scrapping and API call is likely under the regulation of University IRB board. Please consult Stanford IRB office for detail.*
@@ -274,7 +274,7 @@ Let's try to use the everything endpoint to search for keyword "Canada"
 endpoint_url <- "https://newsapi.org/v2/everything?"
 my_query <- "canada"
 my_start_date <- Sys.Date() - 7
-Sys.setenv(NEWS_API_KEY = "89610f37b61a43c389d3830aebff2a81") #change to your actual API key
+Sys.setenv(NEWS_API_KEY = "change to your actual api key here!") #change to your actual API key
 my_api_key <- Sys.getenv("NEWS_API_KEY") 
 
 params <- list(
