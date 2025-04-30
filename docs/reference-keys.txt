@@ -29,3 +29,9 @@ betweenness-centrality
 visualizing-key-measures
 benchmark-our-empirical-network
 find-local-clusterscommunities
+other-resources
+collecting-data-online
+scraping-the-web
+google-news-api
+prerequistes
+get-started
