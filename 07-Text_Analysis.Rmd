@@ -1,0 +1,53 @@
+# Text Analysis
+
+*This section is inspired by https://m-clark.github.io/text-analysis-with-R/sentiment-analysis.html.*
+
+Text data are now everywhere: tweets and forum posts, press releases and policy documents, interview transcripts and open-ended survey answers. Turning that unstructured torrent into systematic evidence is quickly becoming a core skill for social scientists, data analysts, and anyone who needs to understand language at scale.
+
+This hands-on R tutorial walks you through three foundational techniques—sentiment analysis, topic modeling, and word embeddings—that together cover the full spectrum from simple lexicon-based scoring to advanced distributional semantics. 
+
+## Sentiment Analysis
+Sentiment analysis is often the most intuitive entry point to text analytics. Its goal is to quantify the emotional tone of a corpus. Although a human reader can judge sentiment in a single sentence, automated methods are indispensable when the dataset grows to hundreds of thousands or even millions of sentences and documents.
+
+The tidytext package in R streamlines this process. Let's start by installing this pacakge
+
+```r
+install.packages("tidytext")
+library(tidytext)
+library(tidyverse)
+```
+
+```r
+install.packages("gutenbergr")
+library(gutenbergr)
+book_hm = gutenberg_works(title == "Hamlet")  
+```
+
+Let's take a look of the book_hm object we just created.
+
+```r
+book_hm
+# A tibble: 1 × 8
+  gutenberg_id title author gutenberg_author_id language gutenberg_bookshelf rights has_text
+         <int> <chr> <chr>                <int> <chr>    <chr>               <chr>  <lgl>   
+1         2265 Haml… Shake…                  65 en       Best Books Ever Li… Publi… TRUE   
+```
+
+We can donwload the text by going to the website and using our gutenberg_id.
+
+```r
+text_hm = gutenberg_download(book_hm$gutenberg_id)
+```
+
+Let's take a look at text_hm and notice that there are still things to be cleaned. We first slice off the initial parts we don’t want like title, author etc. Then we get rid of other tidbits that would interfere, using a little regex as well to aid the process. 
+
+```r
+text_hm_filtered = text_hm %>% 
+  slice(-(1:94)) %>%  #Drops the first 94 rows (negative slice = “all but”). These rows are usually Gutenberg boiler-plate (title page, licensing notes, table of contents). 
+  filter(!text==str_to_upper(text),            # Eliminates rows whose entire string is in ALL-CAPS. In a Shakespeare script those are mostly block headers—THE PROLOGUE, ENTER HORATIO, etc.—which carry no narrative sentiment.
+         !text==str_to_title(text),            # Eliminates rows whose string equals its Title-Case version. 
+         !str_detect(text, pattern='^(Scene|SCENE)|^(Act|ACT)|^\\[')) %>% 
+  select(-gutenberg_id) %>%  #Drops the unneeded gutenberg_id column to declutter the data frame.
+  unnest_tokens(sentence, input=text, token='sentences') %>%  #Splits each surviving line into individual sentences (tidytext tokenization), giving one row per sentence—ideal granularity for sentiment scoring.
+  mutate(sentenceID = 1:n()) #Adds a running sentenceID so every sentence has a unique key for joins, plotting, or ordering later on.
+```
