@@ -219,7 +219,7 @@ library(jsonlite)    # parse JSON responses
 
 endpoint_url <- "https://newsapi.org/v2/everything"
 
-Sys.setenv(NEWS_API_KEY = "89610f37b61a43c389d3830aebff2a81")   
+Sys.setenv(NEWS_API_KEY = "insert your api here")   
 my_api_key <- Sys.getenv("NEWS_API_KEY")
 
 params <- list(
@@ -406,7 +406,7 @@ Topic 3	is very clear: Liverpool FC / Premier-League storylines, focused on Tren
 
 Topic 4	feels like rankings / power-list / draft coverage; many “Top 10 Teams” or “Live Draft” style blurbs.	Still noisy (live, york, espn’s).
 
-Let's now turn to topic proportions per document  (γ matrix)
+Let's now turn to topic proportions per document  (γ matrix). Essentially, we measure the topic identity for each of the 100 news articles.
 
 ```r
 doc_topics <- tidy(lda_model, matrix = "gamma")
@@ -431,8 +431,8 @@ doc_topics
 # ℹ 390 more rows
 # ℹ Use `print(n = ...)` to see more rows
 ```
+Let's now plot average prominence of each topic across the corpus. 
 ```r
-## Average prominence of each topic across the corpus
 doc_topics %>%
   group_by(topic) %>%
   summarise(mean_gamma = mean(gamma)) %>%
@@ -442,3 +442,8 @@ doc_topics %>%
        x = "Topic", y = "Mean γ (document-topic proportion)")
 ```
 ![](week6_plot6.png)
+
+We can see that topic 4 (on draft and rankings) is most salient across the articles.
+
+In this section, we see the usefulness of topic modeling and also see its weakness. First, we need to pre-specify K. That is, we must choose the number of topics in advance. In addition, high-frequency function words can dominate a topic if not carefully filtered/weighted.	Finally,some learned topics are statistical artifacts (mixtures of unrelated high-probability words).
+
