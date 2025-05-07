@@ -448,4 +448,104 @@ We can see that topic 4 (on draft and rankings) is most salient across the artic
 In this section, we see the usefulness of topic modeling and also see its weakness. First, we need to pre-specify K. That is, we must choose the number of topics in advance. In addition, high-frequency function words can dominate a topic if not carefully filtered/weighted.	Finally,some learned topics are statistical artifacts (mixtures of unrelated high-probability words).
 
 ## Word Embeddings
+We have encountered the concept of word embeddings multiple times in the readings. It is now the time to actually see how it works! Essentially, a word embedding instead gives every word a vector—just a short list of numbers, e.g.
 
+$$
+lion  →  [-0.11, 0.87, 0.02, …, 0.35]   \\
+coward → [ 0.64, -0.57, …, -0.12]
+$$
+
+Words that appear in similar contexts (“The lion showed great courage”) will get vectors that sit near each other in this multi-dimensional space.
+
+We can then:
+1. measure semantic similarity (cosine distance),
+3. add & subtract meanings (king – man + woman ≈ queen),
+3. feed the vectors into regressions.
+
+Let's see how to construct word embeddings from text!
+
+We already built text_oz_filtered in the sentiment section. It is a data-frame where each row is a word (token).
+
+```r
+library(text2vec)       # Framework for GloVe / word2vec in R
+
+tokens <- text_oz_filtered$word   # grab the column as a character vector
+length(tokens)                    # sanity-check: ~25 000 tokens
+```
+```r
+12322
+```
+
+Now we need to decide which words are worth learning vectors for.
+
+```r
+tokens_list <- list(tokens)   
+it  <- itoken(tokens_list, progressbar = FALSE) # text2vec “iterator” over tokens
+
+vocab <- create_vocabulary(it) %>% prune_vocabulary(term_count_min = 5) # build + prune
+```       
+Each row of vocab now lists a word (“term”) and how many times it appeared. Low-frequency words are thrown away because the model has too little information to pin down their meaning.
+
+Let's now build a Term–Co-Occurrence Matrix (TCM). Why? GloVe does not look at documents; it looks at windows of neighbouring words.
+For every pair of words, it counts how often they show up within, say, 5 words of each other.
+
+```r
+vectorizer <- vocab_vectorizer(vocab)     # tells text2vec how to convert tokens → IDs
+
+tcm <- create_tcm(it,
+                  vectorizer,
+                  skip_grams_window = 5L) # ±5-word window around a focus term
+dim(tcm)     # (vocabulary size) × (vocabulary size) sparse matrix
+```
+Let's check what is inside
+
+```r
+             lion  Dorothy  heart ...
+lion           0      27      12
+Dorothy       27       0      15
+heart         12      15       0
+...
+```
+
+Inside the matrix, a value of 27 means “lion” appeared within five words of “Dorothy” 27 times. The matrix is sparse and stored efficiently—most pairs never co-occur.
+
+Now we can run GloVe model, a popular word embedding method!
+
+Parameter	Intuition
+rank	Output dimensions. More ≈ richer detail but needs bigger data.
+x_max	Caps the influence of very frequent pairs; 10 is usual.
+n_iter	Training passes over the TCM. Watch the loss metric—stop early if it plateaus.
+
+```r
+set.seed(42)                      # reproducible experiments
+glove <- GlobalVectors$new(rank = 50,   # 50 dims ≈ sweet spot for small corpora
+                           x_max = 10)  # how strongly to down-weight rare pairs
+
+word_vectors_main <- glove$fit_transform(tcm,
+                                         n_iter = 15,            # training epochs
+                                         convergence_tol = 1e-3) # stop if improvement < ε
+
+# GloVe learns two sets of vectors (main + context).  Sum them:
+word_vectors <- word_vectors_main + t(glove$components)
+
+dim(word_vectors)   # (vocabulary size) × 50
+```
+Now let's find nearest neighbours
+```r
+sim_words <- function(term, n = 3) {
+  sims <- sim2(word_vectors,
+               word_vectors[term, , drop = FALSE],
+               method = "cosine", norm = "l2")
+  sort(sims[,1], decreasing = TRUE)[2:(n+1)]   # drop self-similarity
+}
+```
+```r
+sim_words("dorothy")
+scarecrow        oz   replied 
+0.7104297 0.6610949 0.6609231 
+```
+
+Key take-aways
+1. Word embeddings let you turn raw text into numeric features that “know” something about meaning.
+2. Even a tiny corpus like The Wonderful Wizard of Oz gives vectors that make intuitive sense.
+3. Once vectors exist, you can visualise them, cluster them, feed them into any machine-learning or statistical model—exactly as you would with height, age, or income.

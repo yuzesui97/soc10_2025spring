@@ -533,6 +533,75 @@ words like monday, time, espn are schedule/meta terms, not content.</p>
 </div>
 <div id="word-embeddings" class="section level2 hasAnchor" number="6.3">
 <h2><span class="header-section-number">6.3</span> Word Embeddings<a href="text-analysis.html#word-embeddings" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We have encountered the concept of word embeddings multiple times in the readings. It is now the time to actually see how it works! Essentially, a word embedding instead gives every word a vector—just a short list of numbers, e.g.</p>
+<p><span class="math display">\[
+lion  →  [-0.11, 0.87, 0.02, …, 0.35]   \\
+coward → [ 0.64, -0.57, …, -0.12]
+\]</span></p>
+<p>Words that appear in similar contexts (“The lion showed great courage”) will get vectors that sit near each other in this multi-dimensional space.</p>
+<p>We can then:
+1. measure semantic similarity (cosine distance),
+3. add &amp; subtract meanings (king – man + woman ≈ queen),
+3. feed the vectors into regressions.</p>
+<p>Let’s see how to construct word embeddings from text!</p>
+<p>We already built text_oz_filtered in the sentiment section. It is a data-frame where each row is a word (token).</p>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="text-analysis.html#cb173-1" tabindex="-1"></a><span class="fu">library</span>(text2vec)       <span class="co"># Framework for GloVe / word2vec in R</span></span>
+<span id="cb173-2"><a href="text-analysis.html#cb173-2" tabindex="-1"></a></span>
+<span id="cb173-3"><a href="text-analysis.html#cb173-3" tabindex="-1"></a>tokens <span class="ot">&lt;-</span> text_oz_filtered<span class="sc">$</span>word   <span class="co"># grab the column as a character vector</span></span>
+<span id="cb173-4"><a href="text-analysis.html#cb173-4" tabindex="-1"></a><span class="fu">length</span>(tokens)                    <span class="co"># sanity-check: ~25 000 tokens</span></span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="text-analysis.html#cb174-1" tabindex="-1"></a><span class="dv">12322</span></span></code></pre></div>
+<p>Now we need to decide which words are worth learning vectors for.</p>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="text-analysis.html#cb175-1" tabindex="-1"></a>tokens_list <span class="ot">&lt;-</span> <span class="fu">list</span>(tokens)   </span>
+<span id="cb175-2"><a href="text-analysis.html#cb175-2" tabindex="-1"></a>it  <span class="ot">&lt;-</span> <span class="fu">itoken</span>(tokens_list, <span class="at">progressbar =</span> <span class="cn">FALSE</span>) <span class="co"># text2vec “iterator” over tokens</span></span>
+<span id="cb175-3"><a href="text-analysis.html#cb175-3" tabindex="-1"></a></span>
+<span id="cb175-4"><a href="text-analysis.html#cb175-4" tabindex="-1"></a>vocab <span class="ot">&lt;-</span> <span class="fu">create_vocabulary</span>(it) <span class="sc">%&gt;%</span> <span class="fu">prune_vocabulary</span>(<span class="at">term_count_min =</span> <span class="dv">5</span>) <span class="co"># build + prune</span></span></code></pre></div>
+<p>Each row of vocab now lists a word (“term”) and how many times it appeared. Low-frequency words are thrown away because the model has too little information to pin down their meaning.</p>
+<p>Let’s now build a Term–Co-Occurrence Matrix (TCM). Why? GloVe does not look at documents; it looks at windows of neighbouring words.
+For every pair of words, it counts how often they show up within, say, 5 words of each other.</p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="text-analysis.html#cb176-1" tabindex="-1"></a>vectorizer <span class="ot">&lt;-</span> <span class="fu">vocab_vectorizer</span>(vocab)     <span class="co"># tells text2vec how to convert tokens → IDs</span></span>
+<span id="cb176-2"><a href="text-analysis.html#cb176-2" tabindex="-1"></a></span>
+<span id="cb176-3"><a href="text-analysis.html#cb176-3" tabindex="-1"></a>tcm <span class="ot">&lt;-</span> <span class="fu">create_tcm</span>(it,</span>
+<span id="cb176-4"><a href="text-analysis.html#cb176-4" tabindex="-1"></a>                  vectorizer,</span>
+<span id="cb176-5"><a href="text-analysis.html#cb176-5" tabindex="-1"></a>                  <span class="at">skip_grams_window =</span> <span class="dv">5</span><span class="dt">L</span>) <span class="co"># ±5-word window around a focus term</span></span>
+<span id="cb176-6"><a href="text-analysis.html#cb176-6" tabindex="-1"></a><span class="fu">dim</span>(tcm)     <span class="co"># (vocabulary size) × (vocabulary size) sparse matrix</span></span></code></pre></div>
+<p>Let’s check what is inside</p>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="text-analysis.html#cb177-1" tabindex="-1"></a>             lion  Dorothy  heart ...</span>
+<span id="cb177-2"><a href="text-analysis.html#cb177-2" tabindex="-1"></a>lion           <span class="dv">0</span>      <span class="dv">27</span>      <span class="dv">12</span></span>
+<span id="cb177-3"><a href="text-analysis.html#cb177-3" tabindex="-1"></a>Dorothy       <span class="dv">27</span>       <span class="dv">0</span>      <span class="dv">15</span></span>
+<span id="cb177-4"><a href="text-analysis.html#cb177-4" tabindex="-1"></a>heart         <span class="dv">12</span>      <span class="dv">15</span>       <span class="dv">0</span></span>
+<span id="cb177-5"><a href="text-analysis.html#cb177-5" tabindex="-1"></a>...</span></code></pre></div>
+<p>Inside the matrix, a value of 27 means “lion” appeared within five words of “Dorothy” 27 times. The matrix is sparse and stored efficiently—most pairs never co-occur.</p>
+<p>Now we can run GloVe model, a popular word embedding method!</p>
+<p>Parameter Intuition
+rank Output dimensions. More ≈ richer detail but needs bigger data.
+x_max Caps the influence of very frequent pairs; 10 is usual.
+n_iter Training passes over the TCM. Watch the loss metric—stop early if it plateaus.</p>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="text-analysis.html#cb178-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)                      <span class="co"># reproducible experiments</span></span>
+<span id="cb178-2"><a href="text-analysis.html#cb178-2" tabindex="-1"></a>glove <span class="ot">&lt;-</span> GlobalVectors<span class="sc">$</span><span class="fu">new</span>(<span class="at">rank =</span> <span class="dv">50</span>,   <span class="co"># 50 dims ≈ sweet spot for small corpora</span></span>
+<span id="cb178-3"><a href="text-analysis.html#cb178-3" tabindex="-1"></a>                           <span class="at">x_max =</span> <span class="dv">10</span>)  <span class="co"># how strongly to down-weight rare pairs</span></span>
+<span id="cb178-4"><a href="text-analysis.html#cb178-4" tabindex="-1"></a></span>
+<span id="cb178-5"><a href="text-analysis.html#cb178-5" tabindex="-1"></a>word_vectors_main <span class="ot">&lt;-</span> glove<span class="sc">$</span><span class="fu">fit_transform</span>(tcm,</span>
+<span id="cb178-6"><a href="text-analysis.html#cb178-6" tabindex="-1"></a>                                         <span class="at">n_iter =</span> <span class="dv">15</span>,            <span class="co"># training epochs</span></span>
+<span id="cb178-7"><a href="text-analysis.html#cb178-7" tabindex="-1"></a>                                         <span class="at">convergence_tol =</span> <span class="fl">1e-3</span>) <span class="co"># stop if improvement &lt; ε</span></span>
+<span id="cb178-8"><a href="text-analysis.html#cb178-8" tabindex="-1"></a></span>
+<span id="cb178-9"><a href="text-analysis.html#cb178-9" tabindex="-1"></a><span class="co"># GloVe learns two sets of vectors (main + context).  Sum them:</span></span>
+<span id="cb178-10"><a href="text-analysis.html#cb178-10" tabindex="-1"></a>word_vectors <span class="ot">&lt;-</span> word_vectors_main <span class="sc">+</span> <span class="fu">t</span>(glove<span class="sc">$</span>components)</span>
+<span id="cb178-11"><a href="text-analysis.html#cb178-11" tabindex="-1"></a></span>
+<span id="cb178-12"><a href="text-analysis.html#cb178-12" tabindex="-1"></a><span class="fu">dim</span>(word_vectors)   <span class="co"># (vocabulary size) × 50</span></span></code></pre></div>
+<p>Now let’s find nearest neighbours</p>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="text-analysis.html#cb179-1" tabindex="-1"></a>sim_words <span class="ot">&lt;-</span> <span class="cf">function</span>(term, <span class="at">n =</span> <span class="dv">3</span>) {</span>
+<span id="cb179-2"><a href="text-analysis.html#cb179-2" tabindex="-1"></a>  sims <span class="ot">&lt;-</span> <span class="fu">sim2</span>(word_vectors,</span>
+<span id="cb179-3"><a href="text-analysis.html#cb179-3" tabindex="-1"></a>               word_vectors[term, , <span class="at">drop =</span> <span class="cn">FALSE</span>],</span>
+<span id="cb179-4"><a href="text-analysis.html#cb179-4" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;cosine&quot;</span>, <span class="at">norm =</span> <span class="st">&quot;l2&quot;</span>)</span>
+<span id="cb179-5"><a href="text-analysis.html#cb179-5" tabindex="-1"></a>  <span class="fu">sort</span>(sims[,<span class="dv">1</span>], <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">2</span><span class="sc">:</span>(n<span class="sc">+</span><span class="dv">1</span>)]   <span class="co"># drop self-similarity</span></span>
+<span id="cb179-6"><a href="text-analysis.html#cb179-6" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="text-analysis.html#cb180-1" tabindex="-1"></a><span class="fu">sim_words</span>(<span class="st">&quot;dorothy&quot;</span>)</span>
+<span id="cb180-2"><a href="text-analysis.html#cb180-2" tabindex="-1"></a>scarecrow        oz   replied </span>
+<span id="cb180-3"><a href="text-analysis.html#cb180-3" tabindex="-1"></a><span class="fl">0.7104297</span> <span class="fl">0.6610949</span> <span class="fl">0.6609231</span> </span></code></pre></div>
+<p>Key take-aways
+1. Word embeddings let you turn raw text into numeric features that “know” something about meaning.
+2. Even a tiny corpus like The Wonderful Wizard of Oz gives vectors that make intuitive sense.
+3. Once vectors exist, you can visualise them, cluster them, feed them into any machine-learning or statistical model—exactly as you would with height, age, or income.</p>
 
 </div>
 </div>
