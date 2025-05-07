@@ -35,3 +35,7 @@ scraping-the-web
 google-news-api
 prerequistes
 get-started
+text-analysis
+sentiment-analysis
+topic-modeling
+word-embeddings

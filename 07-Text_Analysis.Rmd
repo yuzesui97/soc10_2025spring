@@ -447,3 +447,5 @@ We can see that topic 4 (on draft and rankings) is most salient across the artic
 
 In this section, we see the usefulness of topic modeling and also see its weakness. First, we need to pre-specify K. That is, we must choose the number of topics in advance. In addition, high-frequency function words can dominate a topic if not carefully filtered/weighted.	Finally,some learned topics are statistical artifacts (mixtures of unrelated high-probability words).
 
+## Word Embeddings
+

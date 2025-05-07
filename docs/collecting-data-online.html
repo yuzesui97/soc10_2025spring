@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Week 5 Collecting data online | Stanford Spring 2025 Intro to Computational Social Science</title>
-  <meta name="description" content="Week 5 Collecting data online | Stanford Spring 2025 Intro to Computational Social Science" />
+  <title>Week 5 Collecting Data Online | Stanford Spring 2025 Intro to Computational Social Science</title>
+  <meta name="description" content="Week 5 Collecting Data Online | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Week 5 Collecting data online | Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta property="og:title" content="Week 5 Collecting Data Online | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Week 5 Collecting data online | Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta name="twitter:title" content="Week 5 Collecting Data Online | Stanford Spring 2025 Intro to Computational Social Science" />
   
   
   
@@ -31,7 +31,7 @@
   
   
 <link rel="prev" href="social-network-analysis.html"/>
-
+<link rel="next" href="text-analysis.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -185,7 +185,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.6.1" data-path="social-network-analysis.html"><a href="social-network-analysis.html#other-resources"><i class="fa fa-check"></i><b>4.6.1</b> Other Resources</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="collecting-data-online.html"><a href="collecting-data-online.html"><i class="fa fa-check"></i><b>5</b> Collecting data online</a>
+<li class="chapter" data-level="5" data-path="collecting-data-online.html"><a href="collecting-data-online.html"><i class="fa fa-check"></i><b>5</b> Collecting Data Online</a>
 <ul>
 <li class="chapter" data-level="5.1" data-path="collecting-data-online.html"><a href="collecting-data-online.html#scraping-the-web"><i class="fa fa-check"></i><b>5.1</b> Scraping the web</a></li>
 <li class="chapter" data-level="5.2" data-path="collecting-data-online.html"><a href="collecting-data-online.html#google-news-api"><i class="fa fa-check"></i><b>5.2</b> Google News API</a>
@@ -193,6 +193,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.2.1" data-path="collecting-data-online.html"><a href="collecting-data-online.html#prerequistes"><i class="fa fa-check"></i><b>5.2.1</b> Prerequistes</a></li>
 <li class="chapter" data-level="5.2.2" data-path="collecting-data-online.html"><a href="collecting-data-online.html#get-started"><i class="fa fa-check"></i><b>5.2.2</b> Get started</a></li>
 </ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="text-analysis.html"><a href="text-analysis.html"><i class="fa fa-check"></i><b>6</b> Text Analysis</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="text-analysis.html"><a href="text-analysis.html#sentiment-analysis"><i class="fa fa-check"></i><b>6.1</b> Sentiment Analysis</a></li>
+<li class="chapter" data-level="6.2" data-path="text-analysis.html"><a href="text-analysis.html#topic-modeling"><i class="fa fa-check"></i><b>6.2</b> Topic Modeling</a></li>
+<li class="chapter" data-level="6.3" data-path="text-analysis.html"><a href="text-analysis.html#word-embeddings"><i class="fa fa-check"></i><b>6.3</b> Word Embeddings</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -214,7 +220,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="collecting-data-online" class="section level1 hasAnchor" number="5">
-<h1><span class="header-section-number">Week 5</span> Collecting data online<a href="collecting-data-online.html#collecting-data-online" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<h1><span class="header-section-number">Week 5</span> Collecting Data Online<a href="collecting-data-online.html#collecting-data-online" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><em>This section is drafted based on Dr. Mark Hoffman’s previous SOC 10 lab notes.</em>
 <em>Conducting research via webpage scrapping and API call is likely under the regulation of University IRB board. Please consult Stanford IRB office for detail.</em></p>
 <p>In previous tutorials, we learned how to download datasets online or collect them ourselves using survey software like Qualtrics and to load them into R for analysis. A lot of computational social science data, however, doesn’t come in such easily downloadable form. This is for a couple reasons. For one, companies might provide their data for viewing on a webpage rather than in a .csv or .dta file. Wikipedia, for example, contains thousands and thousands of data tables, concerning topics from GDP per capita by country to the number and types of awards won by Kanye West. These data are publicly available in the form of tables on their various webpages; but there is no single place where you can download all of them. We therefore will need to learn how to grab this data off their webpages using something called web scraping or crawling in R. This is, in part, what Google uses to index the content of websites and offer them to you following your searches.</p>
@@ -387,7 +393,7 @@ Note that there are a set of limitations for the free version. You can purchase 
 <div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="collecting-data-online.html#cb128-1" tabindex="-1"></a>endpoint_url <span class="ot">&lt;-</span> <span class="st">&quot;https://newsapi.org/v2/everything?&quot;</span></span>
 <span id="cb128-2"><a href="collecting-data-online.html#cb128-2" tabindex="-1"></a>my_query <span class="ot">&lt;-</span> <span class="st">&quot;canada&quot;</span></span>
 <span id="cb128-3"><a href="collecting-data-online.html#cb128-3" tabindex="-1"></a>my_start_date <span class="ot">&lt;-</span> <span class="fu">Sys.Date</span>() <span class="sc">-</span> <span class="dv">7</span></span>
-<span id="cb128-4"><a href="collecting-data-online.html#cb128-4" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">NEWS_API_KEY =</span> <span class="st">&quot;89610f37b61a43c389d3830aebff2a81&quot;</span>) <span class="co">#change to your actual API key</span></span>
+<span id="cb128-4"><a href="collecting-data-online.html#cb128-4" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">NEWS_API_KEY =</span> <span class="st">&quot;change to your actual api key here!&quot;</span>) <span class="co">#change to your actual API key</span></span>
 <span id="cb128-5"><a href="collecting-data-online.html#cb128-5" tabindex="-1"></a>my_api_key <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">&quot;NEWS_API_KEY&quot;</span>) </span>
 <span id="cb128-6"><a href="collecting-data-online.html#cb128-6" tabindex="-1"></a></span>
 <span id="cb128-7"><a href="collecting-data-online.html#cb128-7" tabindex="-1"></a>params <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
@@ -429,8 +435,8 @@ Note that there are a set of limitations for the free version. You can purchase 
           </div>
         </div>
       </div>
-<a href="social-network-analysis.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="social-network-analysis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="text-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
