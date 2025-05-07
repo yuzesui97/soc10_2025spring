@@ -470,7 +470,7 @@ We already built text_oz_filtered in the sentiment section. It is a data-frame w
 library(text2vec)       # Framework for GloVe / word2vec in R
 
 tokens <- text_oz_filtered$word   # grab the column as a character vector
-length(tokens)                    # sanity-check: ~25 000 tokens
+length(tokens)                   
 ```
 ```r
 12322
@@ -482,7 +482,7 @@ Now we need to decide which words are worth learning vectors for.
 tokens_list <- list(tokens)   
 it  <- itoken(tokens_list, progressbar = FALSE) # text2vec “iterator” over tokens
 
-vocab <- create_vocabulary(it) %>% prune_vocabulary(term_count_min = 5) # build + prune
+vocab <- create_vocabulary(it) 
 ```       
 Each row of vocab now lists a word (“term”) and how many times it appeared. Low-frequency words are thrown away because the model has too little information to pin down their meaning.
 
@@ -532,7 +532,7 @@ dim(word_vectors)   # (vocabulary size) × 50
 ```
 Now let's find nearest neighbours
 ```r
-sim_words <- function(term, n = 3) {
+sim_words <- function(term, n = 2) {
   sims <- sim2(word_vectors,
                word_vectors[term, , drop = FALSE],
                method = "cosine", norm = "l2")
@@ -540,11 +540,15 @@ sim_words <- function(term, n = 3) {
 }
 ```
 ```r
-sim_words("dorothy")
-scarecrow        oz   replied 
-0.7104297 0.6610949 0.6609231 
+sim_words("girl")
+dorothy    pretty 
+0.6798370 0.6625228
 ```
-
+```r
+sim_words("oz")
+       oz    people 
+0.5891468 0.5672807 
+```
 Key take-aways
 1. Word embeddings let you turn raw text into numeric features that “know” something about meaning.
 2. Even a tiny corpus like The Wonderful Wizard of Oz gives vectors that make intuitive sense.
