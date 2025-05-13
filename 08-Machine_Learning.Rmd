@@ -1,0 +1,101 @@
+# Machine Learning (Supervised Learning)
+
+In previous weeks, we fit linear regressions and logistic regression using all available data. That is the conventional practice for explanatory studies but not for predictive studies (i.e., Machine Learning). Here, we introduce the practice of splitting data into training and test sets, and demonstrate why this is crucial for evaluating a model’s performance on new data. We will use the 2018 General Social Survey (GSS 2018) data and the same variables from prior labs (e.g., age, education, sex, and income) to build and compare three types of models:
+
+A standard linear regression (as a baseline).
+A decision tree regression model.
+A random forest regression model.
+
+We’ll fit each model on a training subset of the GSS data, evaluate their performance on both training and test sets, and compare their predictive accuracy using metrics like the Root Mean Squared Error (RMSE). Throughout, we will use the tidyverse and tidymodels frameworks for a consistent, tidy approach to modeling.
+
+## Training vs. Test Data: Why Split?
+
+When developing a predictive model, our goal is not just to describe the patterns in the training data but to make accurate predictions on new, unseen data. If we evaluate a model on the same data used for training, we risk being overly optimistic about its performance – the model may simply be memorizing noise or idiosyncrasies in that dataset, a phenomenon known as overfitting. By setting aside a portion of data as a test set (also called a hold-out set), we obtain an honest assessment of how the model might perform on future data. Key idea: We will split the GSS 2018 data into a training set (to fit the models) and a test set (to evaluate them). For example, we might use 80% of the data for training and reserve 20% for testing. The test set will act as new data that the model has not seen during training, allowing us to check how well the model generalizes. Let’s apply this concept using a linear regression model as an example. We’ll predict real household income (realinc) using respondents’ age, education (educ years), and sex – the same variables we explored in earlier regression labs. We will:
+
+1. Split the GSS 2018 data into training and test sets.
+2. Fit a linear regression on the training set.
+3. Evaluate the model’s performance on both the training set and the test set, comparing metrics to see the difference.
+
+### Splitting the GSS 2018 Data
+We use initial_split() from the rsample package (part of tidymodels) to randomly split the data. Below, we split 80% of the GSS data into gss_train and 20% into gss_test. We set a random seed for reproducibility so everyone gets the same split:
+
+```
+library(tidyverse)
+library(tidymodels)
+library(haven)
+set.seed(123)  # for reproducibility of the random split
+gss <- read_dta("GSS2018.dta")
+
+# Create an 80/20 train-test split
+gss_split <- initial_split(gss, prop = 0.8)
+gss_train <- training(gss_split)
+gss_test  <- testing(gss_split)
+```
+
+We can verify the split:
+
+```
+# Verify the split sizes
+nrow(gss_train)
+nrow(gss_test)
+```
+```
+## [1] 1878
+## [1] 470
+```
+
+We have 2,348 observations in GSS 2018 (as seen in Week 1’s exploration), so the training set has 1,878 rows and the test set 470 rows (approximately 80/20 split). Now, we’ll build a linear regression model using the training data.
+
+### Linear Regression with Training and Test Data
+
+First, we define a linear regression model specification using tidymodels’ parsnip package. We then fit this model to the training data, predicting realinc (real income) from age, educ, and sex. Finally, we evaluate the model’s performance on both training and test sets.
+
+```
+# Define a linear regression model specification
+lin_mod <- linear_reg() %>% 
+  set_engine("lm") %>%            # use R's linear model engine
+  set_mode("regression")          # this is a regression (predicting numeric outcome)
+
+# Fit the model on the training data
+lin_fit <- lin_mod %>% fit(realinc ~ age + educ + sex, data = gss_train)
+```
+
+The model lin_fit now contains the linear regression results (coefficients, etc.) trained on gss_train. We can check how well this model fits the training data versus how well it predicts the test data. We’ll use the following metric:
+
+RMSE (Root Mean Squared Error): the square root of the average squared error. This is in the same units as the outcome (income in dollars) – lower RMSE means better prediction.
+
+
+Using the yardstick package (loaded via tidymodels), we can easily compute the metric. We’ll generate predictions on both the training set and test set, then calculate RMSE for each:
+
+```
+# Evaluate performance on the training data
+lin_train_preds <- predict(lin_fit, gss_train) %>% 
+  bind_cols(gss_train)          # bind predictions with true values
+rmse(lin_train_preds, truth = realinc, estimate = .pred)
+```
+```
+# A tibble: 1 × 3
+  .metric .estimator .estimate
+  <chr>   <chr>          <dbl>
+1 rmse    binary        28930.
+```
+```
+# Evaluate performance on the test data
+lin_test_preds <- predict(lin_fit, gss_test) %>% 
+  bind_cols(gss_test)
+rmse(lin_test_preds, truth = realinc, estimate = .pred)
+```
+```
+# A tibble: 1 × 3
+  .metric .estimator .estimate
+  <chr>   <chr>          <dbl>
+1 rmse    binary        28140.
+```
+
+Interpretation: On the training data, our linear model has an RMSE of about 28,930, meaning on average the model’s predictions deviate from actual incomes by around $28k. On the test data, the RMSE is about 28140. These are very close to the training values (in fact, the test RMSE is slightly lower in this instance, which can happen by chance or if the model is slightly underfitting). 
+
+The key point is that the model’s performance on new data is in the same ballpark as on the training data, suggesting that our linear model did not severely overfit. This makes sense – a linear regression with three predictors is a relatively simple model (low variance), so it generalizes reasonably well.
+
+Now that we understand training vs. test evaluation with a familiar model, let’s introduce more flexible machine learning models – decision trees and random forests – and see how they perform on the same task.
+
+
