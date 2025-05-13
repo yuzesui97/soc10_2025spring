@@ -337,6 +337,17 @@ rmse(tree_test_preds, truth = realinc, estimate = .pred)</code></pre>
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 1 rmse    standard      26861.</code></pre>
 <p>Interpretation: The decision tree’s training RMSE is lower than the linear model’s. This indicates the tree fit the training data more closely. Same for test set.</p>
+<p>We can also evaluate predictor importance</p>
+<pre><code># If vip isn&#39;t installed yet:
+# install.packages(&quot;vip&quot;)
+
+library(vip)
+library(ggplot2)
+
+# --- Compute and plot importance ---
+vip::vip(tree_fit$fit,           # underlying rpart object
+         num_features = 20) +    # show up to 20 predictors (adjust as needed)
+  ggtitle(&quot;Decision tree – variable importance&quot;)</code></pre>
 </div>
 <div id="random-forests" class="section level2 hasAnchor" number="7.3">
 <h2><span class="header-section-number">7.3</span> Random Forests<a href="machine-learning-supervised-learning.html#random-forests" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -368,6 +379,9 @@ rmse(rf_test_preds, truth = realinc, estimate = .pred, metrics = rmse)</code></p
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 1 rmse    standard      26977.</code></pre>
 <p>Random forest did okay here but not excellent. Why? In other datasets with strong non-linear effects or interactions, a random forest would likely excel. Our example highlights that more complex models are not always better – it depends on the data and underlying patterns.</p>
+<p>Again, we can rank predictors by importance.</p>
+<pre><code>vip::vip(rf_fit$fit, num_features = 20) +
+  ggtitle(&quot;Random forest – variable importance&quot;)</code></pre>
 
 </div>
 </div>
