@@ -153,6 +153,20 @@ rmse(tree_test_preds, truth = realinc, estimate = .pred)
 
 Interpretation: The decision tree’s training RMSE is lower than the linear model’s. This indicates the tree fit the training data more closely. Same for test set. 
 
+We can also evaluate predictor importance
+```
+# If vip isn't installed yet:
+# install.packages("vip")
+
+library(vip)
+library(ggplot2)
+
+# --- Compute and plot importance ---
+vip::vip(tree_fit$fit,           # underlying rpart object
+         num_features = 20) +    # show up to 20 predictors (adjust as needed)
+  ggtitle("Decision tree – variable importance")
+```
+
 ## Random Forests
  Random forests offer one powerful solution. A random forest is essentially an ensemble of many decision trees. The idea is to build a large number of trees (e.g., 100 or 500), each on a slightly different random subset of the data and predictors, and then average their predictions. Key characteristics of random forests:
  
@@ -201,3 +215,10 @@ rmse(rf_test_preds, truth = realinc, estimate = .pred, metrics = rmse)
 ```
 
 Random forest did okay here but not excellent. Why? In other datasets with strong non-linear effects or interactions, a random forest would likely excel. Our example highlights that more complex models are not always better – it depends on the data and underlying patterns.
+
+Again, we can rank predictors by importance.
+
+```
+vip::vip(rf_fit$fit, num_features = 20) +
+  ggtitle("Random forest – variable importance")
+```
