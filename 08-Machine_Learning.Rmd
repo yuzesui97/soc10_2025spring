@@ -26,6 +26,16 @@ library(haven)
 set.seed(123)  # for reproducibility of the random split
 gss <- read_dta("GSS2018.dta")
 
+# Clean the variables
+gss <- gss %>%                                             
+  transmute(
+    realinc = as.numeric(realinc),
+    age     = as.numeric(age),
+    educ    = as.numeric(educ),
+    sex     = as_factor(sex)      # labelled  -> factor
+  ) %>% 
+  drop_na()      
+  
 # Create an 80/20 train-test split
 gss_split <- initial_split(gss, prop = 0.8)
 gss_train <- training(gss_split)
@@ -98,4 +108,96 @@ The key point is that the model’s performance on new data is in the same ballp
 
 Now that we understand training vs. test evaluation with a familiar model, let’s introduce more flexible machine learning models – decision trees and random forests – and see how they perform on the same task.
 
+## Decision Trees for Regression
 
+Decision trees are intuitive, rule-based models that predict an outcome by learning a hierarchy of if-else rules from the data. For regression (continuous outcomes), a decision tree repeatedly splits the data into subsets based on predictor variables’ values, aiming to create groups that are as homogeneous as possible in the outcome. The result is a tree-like model where each leaf node yields a predicted value (typically the mean outcome of training cases in that leaf). 
+
+Why use trees? They can automatically capture non-linear relationships and interactions between predictors. For example, a tree could learn that income increases with education unless the person is above a certain age (retirement age), in which case income might drop – a pattern that a single linear model might miss. Trees are also easy to interpret (we can visualize the splits). 
+
+Downside: Decision trees are prone to overfitting if grown too deep. A fully grown tree can memorize the training data (yielding very low training error) but perform poorly on new data. We usually need to prune the tree or set limits on its depth/leaves to avoid overfitting. Let's fit a decision tree on the same training data (gss_train) to predict realinc. We will use tidymodels again, with the rpart engine (which implements the CART algorithm for decision trees):
+
+```
+# Define a decision tree model specification for regression
+tree_mod <- decision_tree() %>% 
+  set_engine("rpart") %>%        # CART algorithm implementation
+  set_mode("regression")
+
+# Fit the decision tree on the training data
+tree_fit <- tree_mod %>% fit(realinc ~ age + educ + sex, data = gss_train)
+```
+
+Now we have a trained decision tree model tree_fit. We’ll evaluate its RMSE on both training and test sets, just as we did for the linear model:
+
+```
+# Performance on training data
+tree_train_preds <- predict(tree_fit, gss_train) %>% bind_cols(gss_train)
+rmse(tree_train_preds, truth = realinc, estimate = .pred)
+```
+```
+# A tibble: 1 × 3
+  .metric .estimator .estimate
+  <chr>   <chr>          <dbl>
+1 rmse    standard      27990.
+```
+```
+# Performance on test data
+tree_test_preds <- predict(tree_fit, gss_test) %>% bind_cols(gss_test)
+rmse(tree_test_preds, truth = realinc, estimate = .pred)
+```
+```
+# A tibble: 1 × 3
+  .metric .estimator .estimate
+  <chr>   <chr>          <dbl>
+1 rmse    standard      26861.
+```
+
+Interpretation: The decision tree’s training RMSE is lower than the linear model’s. This indicates the tree fit the training data more closely. Same for test set. 
+
+## Random Forests
+ Random forests offer one powerful solution. A random forest is essentially an ensemble of many decision trees. The idea is to build a large number of trees (e.g., 100 or 500), each on a slightly different random subset of the data and predictors, and then average their predictions. Key characteristics of random forests:
+ 
+Each tree in the forest is trained on a bootstrapped sample of the training data (random sampling with replacement), and at each split, the tree considers a random subset of predictors (this is the “random” part of random forests).
+
+Because each tree sees a slightly different view of the data, their errors are not perfectly correlated. Averaging many trees tends to cancel out noise and reduce overfitting, while capturing complex patterns.
+
+Random forests usually don’t require much manual tuning of tree depth – the ensemble approach and averaging naturally controls variance. They often achieve better test performance than a single deep tree, at the cost of losing some interpretability (it’s no longer a single neat set of rules, but hundreds of them aggregated).
+
+We will fit a random forest on the training data using the ranger engine (a fast implementation of random forests). We’ll specify, for example, 100 trees in the forest:
+
+```
+library(ranger)
+# Define a random forest model specification
+rf_mod <- rand_forest(trees = 100) %>% 
+  set_engine("ranger") %>% 
+  set_mode("regression")
+
+# Fit the random forest on the training data
+rf_fit <- rf_mod %>% fit(realinc ~ age + educ + sex, data = gss_train)
+```
+
+```
+# Performance on training data
+rf_train_preds <- predict(rf_fit, gss_train) %>% bind_cols(gss_train)
+rmse(rf_train_preds, truth = realinc, estimate = .pred, metrics = rmse)
+```
+
+```
+# A tibble: 1 × 3
+  .metric .estimator .estimate
+  <chr>   <chr>          <dbl>
+1 rmse    standard      27192.
+```
+```
+# Performance on test data
+rf_test_preds <- predict(rf_fit, gss_test) %>% bind_cols(gss_test)
+rmse(rf_test_preds, truth = realinc, estimate = .pred, metrics = rmse)
+```
+
+```
+# A tibble: 1 × 3
+  .metric .estimator .estimate
+  <chr>   <chr>          <dbl>
+1 rmse    standard      26977.
+```
+
+Random forest did okay here but not excellent. Why? In other datasets with strong non-linear effects or interactions, a random forest would likely excel. Our example highlights that more complex models are not always better – it depends on the data and underlying patterns.

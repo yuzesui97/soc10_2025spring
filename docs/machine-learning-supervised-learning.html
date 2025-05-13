@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Stanford Spring 2025 Intro to Computational Social Science</title>
-  <meta name="description" content="Stanford Spring 2025 Intro to Computational Social Science" />
+  <title>Week 7 Machine Learning (Supervised Learning) | Stanford Spring 2025 Intro to Computational Social Science</title>
+  <meta name="description" content="Week 7 Machine Learning (Supervised Learning) | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta property="og:title" content="Week 7 Machine Learning (Supervised Learning) | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta name="twitter:title" content="Week 7 Machine Learning (Supervised Learning) | Stanford Spring 2025 Intro to Computational Social Science" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="text-analysis.html"/>
 
-<link rel="next" href="intro-to-r.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -229,26 +229,155 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Stanford Spring 2025 Intro to Computational Social Science</h1>
-<p class="author"><em>Yuze Sui</em></p>
-<p class="date"><em>2025-03-31</em></p>
-</div>
-<div id="about" class="section level1 unnumbered hasAnchor">
-<h1>About<a href="index.html#about" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><img src="cover.png" /></p>
-<p><em>Figure Source: Katie Pacyna</em></p>
-<p>With an ever-growing amount of data collected on our online and offline behaviors—from our purchasing habits to our social interactions—we now have the unprecedented opportunity to study social life with remarkable precision. This hands-on course explores the promises and pitfalls of leveraging “big data” and algorithms to understand modern social and economic systems. Each week, we will examine key sociological topics such as inequality, discrimination, and polarization through the lens of computational methods, as well as delve into cutting-edge techniques in computational social science. The course culminates in a group research project that will equip you with skills ranging from designing and executing large-scale surveys and experiments to fitting machine learning models and analyzing diverse data types like social networks and natural language. No prior statistical or programming experience is required.</p>
-<p>This website is the place where you can find R progamming lab notes for the course.</p>
+<div id="machine-learning-supervised-learning" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">Week 7</span> Machine Learning (Supervised Learning)<a href="machine-learning-supervised-learning.html#machine-learning-supervised-learning" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>In previous weeks, we fit linear regressions and logistic regression using all available data. That is the conventional practice for explanatory studies but not for predictive studies (i.e., Machine Learning). Here, we introduce the practice of splitting data into training and test sets, and demonstrate why this is crucial for evaluating a model’s performance on new data. We will use the 2018 General Social Survey (GSS 2018) data and the same variables from prior labs (e.g., age, education, sex, and income) to build and compare three types of models:</p>
+<p>A standard linear regression (as a baseline).
+A decision tree regression model.
+A random forest regression model.</p>
+<p>We’ll fit each model on a training subset of the GSS data, evaluate their performance on both training and test sets, and compare their predictive accuracy using metrics like the Root Mean Squared Error (RMSE). Throughout, we will use the tidyverse and tidymodels frameworks for a consistent, tidy approach to modeling.</p>
+<div id="training-vs.-test-data-why-split" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Training vs. Test Data: Why Split?<a href="machine-learning-supervised-learning.html#training-vs.-test-data-why-split" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>When developing a predictive model, our goal is not just to describe the patterns in the training data but to make accurate predictions on new, unseen data. If we evaluate a model on the same data used for training, we risk being overly optimistic about its performance – the model may simply be memorizing noise or idiosyncrasies in that dataset, a phenomenon known as overfitting. By setting aside a portion of data as a test set (also called a hold-out set), we obtain an honest assessment of how the model might perform on future data. Key idea: We will split the GSS 2018 data into a training set (to fit the models) and a test set (to evaluate them). For example, we might use 80% of the data for training and reserve 20% for testing. The test set will act as new data that the model has not seen during training, allowing us to check how well the model generalizes. Let’s apply this concept using a linear regression model as an example. We’ll predict real household income (realinc) using respondents’ age, education (educ years), and sex – the same variables we explored in earlier regression labs. We will:</p>
+<ol style="list-style-type: decimal">
+<li>Split the GSS 2018 data into training and test sets.</li>
+<li>Fit a linear regression on the training set.</li>
+<li>Evaluate the model’s performance on both the training set and the test set, comparing metrics to see the difference.</li>
+</ol>
+<div id="splitting-the-gss-2018-data" class="section level3 hasAnchor" number="7.1.1">
+<h3><span class="header-section-number">7.1.1</span> Splitting the GSS 2018 Data<a href="machine-learning-supervised-learning.html#splitting-the-gss-2018-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We use initial_split() from the rsample package (part of tidymodels) to randomly split the data. Below, we split 80% of the GSS data into gss_train and 20% into gss_test. We set a random seed for reproducibility so everyone gets the same split:</p>
+<pre><code>library(tidyverse)
+library(tidymodels)
+library(haven)
+set.seed(123)  # for reproducibility of the random split
+gss &lt;- read_dta(&quot;GSS2018.dta&quot;)
 
+# Clean the variables
+gss &lt;- gss %&gt;%                                             
+  transmute(
+    realinc = as.numeric(realinc),
+    age     = as.numeric(age),
+    educ    = as.numeric(educ),
+    sex     = as_factor(sex)      # labelled  -&gt; factor
+  ) %&gt;% 
+  drop_na()      
+  
+# Create an 80/20 train-test split
+gss_split &lt;- initial_split(gss, prop = 0.8)
+gss_train &lt;- training(gss_split)
+gss_test  &lt;- testing(gss_split)</code></pre>
+<p>We can verify the split:</p>
+<pre><code># Verify the split sizes
+nrow(gss_train)
+nrow(gss_test)</code></pre>
+<pre><code>## [1] 1878
+## [1] 470</code></pre>
+<p>We have 2,348 observations in GSS 2018 (as seen in Week 1’s exploration), so the training set has 1,878 rows and the test set 470 rows (approximately 80/20 split). Now, we’ll build a linear regression model using the training data.</p>
+</div>
+<div id="linear-regression-with-training-and-test-data" class="section level3 hasAnchor" number="7.1.2">
+<h3><span class="header-section-number">7.1.2</span> Linear Regression with Training and Test Data<a href="machine-learning-supervised-learning.html#linear-regression-with-training-and-test-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>First, we define a linear regression model specification using tidymodels’ parsnip package. We then fit this model to the training data, predicting realinc (real income) from age, educ, and sex. Finally, we evaluate the model’s performance on both training and test sets.</p>
+<pre><code># Define a linear regression model specification
+lin_mod &lt;- linear_reg() %&gt;% 
+  set_engine(&quot;lm&quot;) %&gt;%            # use R&#39;s linear model engine
+  set_mode(&quot;regression&quot;)          # this is a regression (predicting numeric outcome)
+
+# Fit the model on the training data
+lin_fit &lt;- lin_mod %&gt;% fit(realinc ~ age + educ + sex, data = gss_train)</code></pre>
+<p>The model lin_fit now contains the linear regression results (coefficients, etc.) trained on gss_train. We can check how well this model fits the training data versus how well it predicts the test data. We’ll use the following metric:</p>
+<p>RMSE (Root Mean Squared Error): the square root of the average squared error. This is in the same units as the outcome (income in dollars) – lower RMSE means better prediction.</p>
+<p>Using the yardstick package (loaded via tidymodels), we can easily compute the metric. We’ll generate predictions on both the training set and test set, then calculate RMSE for each:</p>
+<pre><code># Evaluate performance on the training data
+lin_train_preds &lt;- predict(lin_fit, gss_train) %&gt;% 
+  bind_cols(gss_train)          # bind predictions with true values
+rmse(lin_train_preds, truth = realinc, estimate = .pred)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    binary        28930.</code></pre>
+<pre><code># Evaluate performance on the test data
+lin_test_preds &lt;- predict(lin_fit, gss_test) %&gt;% 
+  bind_cols(gss_test)
+rmse(lin_test_preds, truth = realinc, estimate = .pred)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    binary        28140.</code></pre>
+<p>Interpretation: On the training data, our linear model has an RMSE of about 28,930, meaning on average the model’s predictions deviate from actual incomes by around $28k. On the test data, the RMSE is about 28140. These are very close to the training values (in fact, the test RMSE is slightly lower in this instance, which can happen by chance or if the model is slightly underfitting).</p>
+<p>The key point is that the model’s performance on new data is in the same ballpark as on the training data, suggesting that our linear model did not severely overfit. This makes sense – a linear regression with three predictors is a relatively simple model (low variance), so it generalizes reasonably well.</p>
+<p>Now that we understand training vs. test evaluation with a familiar model, let’s introduce more flexible machine learning models – decision trees and random forests – and see how they perform on the same task.</p>
+</div>
+</div>
+<div id="decision-trees-for-regression" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Decision Trees for Regression<a href="machine-learning-supervised-learning.html#decision-trees-for-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Decision trees are intuitive, rule-based models that predict an outcome by learning a hierarchy of if-else rules from the data. For regression (continuous outcomes), a decision tree repeatedly splits the data into subsets based on predictor variables’ values, aiming to create groups that are as homogeneous as possible in the outcome. The result is a tree-like model where each leaf node yields a predicted value (typically the mean outcome of training cases in that leaf).</p>
+<p>Why use trees? They can automatically capture non-linear relationships and interactions between predictors. For example, a tree could learn that income increases with education unless the person is above a certain age (retirement age), in which case income might drop – a pattern that a single linear model might miss. Trees are also easy to interpret (we can visualize the splits).</p>
+<p>Downside: Decision trees are prone to overfitting if grown too deep. A fully grown tree can memorize the training data (yielding very low training error) but perform poorly on new data. We usually need to prune the tree or set limits on its depth/leaves to avoid overfitting. Let’s fit a decision tree on the same training data (gss_train) to predict realinc. We will use tidymodels again, with the rpart engine (which implements the CART algorithm for decision trees):</p>
+<pre><code># Define a decision tree model specification for regression
+tree_mod &lt;- decision_tree() %&gt;% 
+  set_engine(&quot;rpart&quot;) %&gt;%        # CART algorithm implementation
+  set_mode(&quot;regression&quot;)
+
+# Fit the decision tree on the training data
+tree_fit &lt;- tree_mod %&gt;% fit(realinc ~ age + educ + sex, data = gss_train)</code></pre>
+<p>Now we have a trained decision tree model tree_fit. We’ll evaluate its RMSE on both training and test sets, just as we did for the linear model:</p>
+<pre><code># Performance on training data
+tree_train_preds &lt;- predict(tree_fit, gss_train) %&gt;% bind_cols(gss_train)
+rmse(tree_train_preds, truth = realinc, estimate = .pred)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard      27990.</code></pre>
+<pre><code># Performance on test data
+tree_test_preds &lt;- predict(tree_fit, gss_test) %&gt;% bind_cols(gss_test)
+rmse(tree_test_preds, truth = realinc, estimate = .pred)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard      26861.</code></pre>
+<p>Interpretation: The decision tree’s training RMSE is lower than the linear model’s. This indicates the tree fit the training data more closely. Same for test set.</p>
+</div>
+<div id="random-forests" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> Random Forests<a href="machine-learning-supervised-learning.html#random-forests" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Random forests offer one powerful solution. A random forest is essentially an ensemble of many decision trees. The idea is to build a large number of trees (e.g., 100 or 500), each on a slightly different random subset of the data and predictors, and then average their predictions. Key characteristics of random forests:</p>
+<p>Each tree in the forest is trained on a bootstrapped sample of the training data (random sampling with replacement), and at each split, the tree considers a random subset of predictors (this is the “random” part of random forests).</p>
+<p>Because each tree sees a slightly different view of the data, their errors are not perfectly correlated. Averaging many trees tends to cancel out noise and reduce overfitting, while capturing complex patterns.</p>
+<p>Random forests usually don’t require much manual tuning of tree depth – the ensemble approach and averaging naturally controls variance. They often achieve better test performance than a single deep tree, at the cost of losing some interpretability (it’s no longer a single neat set of rules, but hundreds of them aggregated).</p>
+<p>We will fit a random forest on the training data using the ranger engine (a fast implementation of random forests). We’ll specify, for example, 100 trees in the forest:</p>
+<pre><code>library(ranger)
+# Define a random forest model specification
+rf_mod &lt;- rand_forest(trees = 100) %&gt;% 
+  set_engine(&quot;ranger&quot;) %&gt;% 
+  set_mode(&quot;regression&quot;)
+
+# Fit the random forest on the training data
+rf_fit &lt;- rf_mod %&gt;% fit(realinc ~ age + educ + sex, data = gss_train)</code></pre>
+<pre><code># Performance on training data
+rf_train_preds &lt;- predict(rf_fit, gss_train) %&gt;% bind_cols(gss_train)
+rmse(rf_train_preds, truth = realinc, estimate = .pred, metrics = rmse)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard      27192.</code></pre>
+<pre><code># Performance on test data
+rf_test_preds &lt;- predict(rf_fit, gss_test) %&gt;% bind_cols(gss_test)
+rmse(rf_test_preds, truth = realinc, estimate = .pred, metrics = rmse)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard      26977.</code></pre>
+<p>Random forest did okay here but not excellent. Why? In other datasets with strong non-linear effects or interactions, a random forest would likely excel. Our example highlights that more complex models are not always better – it depends on the data and underlying patterns.</p>
+
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
+<a href="text-analysis.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="intro-to-r.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -279,7 +408,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/yuzesui97/soc10_2025spring/edit/main/index.Rmd",
+"link": "https://github.com/yuzesui97/soc10_2025spring/edit/main/08-Machine_Learning.Rmd",
 "text": "Edit"
 },
 "history": {
@@ -287,7 +416,7 @@ gitbook.start({
 "text": null
 },
 "view": {
-"link": "https://github.com/yuzesui97/soc10_2025spring/blob/main/index.Rmd",
+"link": "https://github.com/yuzesui97/soc10_2025spring/blob/main/08-Machine_Learning.Rmd",
 "text": null
 },
 "download": null,

@@ -39,3 +39,9 @@ text-analysis
 sentiment-analysis
 topic-modeling
 word-embeddings
+machine-learning-supervised-learning
+training-vs.-test-data-why-split
+splitting-the-gss-2018-data
+linear-regression-with-training-and-test-data
+decision-trees-for-regression
+random-forests
