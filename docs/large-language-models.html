@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science</title>
-  <meta name="description" content="Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science" />
+  <title>Week 8 Large Language Models | Stanford Spring 2025 Intro to Computational Social Science</title>
+  <meta name="description" content="Week 8 Large Language Models | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta property="og:title" content="Week 8 Large Language Models | Stanford Spring 2025 Intro to Computational Social Science" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Week 2 Surveys and Survey Experiments with Qualtrics | Stanford Spring 2025 Intro to Computational Social Science" />
+  <meta name="twitter:title" content="Week 8 Large Language Models | Stanford Spring 2025 Intro to Computational Social Science" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="intro-to-r.html"/>
-<link rel="next" href="regression-and-classification.html"/>
+<link rel="prev" href="machine-learning-supervised-learning.html"/>
+
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -234,70 +234,67 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="surveys-and-survey-experiments-with-qualtrics" class="section level1 hasAnchor" number="2">
-<h1><span class="header-section-number">Week 2</span> Surveys and Survey Experiments with Qualtrics<a href="surveys-and-survey-experiments-with-qualtrics.html#surveys-and-survey-experiments-with-qualtrics" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><em>This section is drafted based on Dr. Mark Hoffman’s previous SOC 10 lab notes.</em></p>
-<div id="overview" class="section level2 hasAnchor" number="2.1">
-<h2><span class="header-section-number">2.1</span> Overview<a href="surveys-and-survey-experiments-with-qualtrics.html#overview" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>In this week, we will go from using data that someone else collected to collecting data of our own using Qualtrics. Qualtrics makes collecting survey data online easy. If you have ever used something like Google Forms, it is, in many respects, quite similar, except that it is much more powerful. As you will see, we can quickly and easily build a survey experiment, administer the experiment, download the results, and import them into R. Let’s get started!</p>
+<div id="large-language-models" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">Week 8</span> Large Language Models<a href="large-language-models.html#large-language-models" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This tutorial provides a hands-on way to see how large-language-model (LLM) APIs can be integrated into an R research workflow for computational social science. Using the 2018 General Social Survey, we first review tidy data handling, then prompt Mistral AI to act as “synthetic respondents” whose age, sex, race, income, and education match each sampled case.</p>
+<p>By contrasting the model’s predicted 2012 presidential vote with the survey’s actual vote distribution and visualising the differences, students learn three key lessons: (1) how to call and parameterize an LLM from R with the {tidychatmodels} grammar; (2) how prompt wording and sampling settings affect generated outputs; and (3) why synthetic text should be interpreted cautiously when compared to real human behavior.</p>
+<div id="tidychatmodels-package" class="section level2 hasAnchor" number="8.1">
+<h2><span class="header-section-number">8.1</span> tidychatmodels Package<a href="large-language-models.html#tidychatmodels-package" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this tutorial, we will use the R package “tidychatmodels”, a recently developed R package by Albert Rapp for LLM API calls, to explore how to integrate LLMs into computational social science research. I also recommend you to read the online documentation for tidychatmodels: <a href="https://albert-rapp.de/posts/20_tidychatmodels/20_tidychatmodels" class="uri">https://albert-rapp.de/posts/20_tidychatmodels/20_tidychatmodels</a></p>
+<pre><code>library(devtools)
+devtools::install_github(&quot;AlbertRapp/tidychatmodels&quot;)
+library(tidychatmodels)</code></pre>
+<p>We also need to following packages for today’s tutorial</p>
+<pre><code>library(haven)
+library(tidyverse)
+library(glue)
+library(scales)
+library(pins)</code></pre>
 </div>
-<div id="creating-a-qualtrics-account" class="section level2 hasAnchor" number="2.2">
-<h2><span class="header-section-number">2.2</span> Creating a Qualtrics account<a href="surveys-and-survey-experiments-with-qualtrics.html#creating-a-qualtrics-account" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Stanford is kind enough to provide all of us with access to Qualtrics. <a href="https://uit.stanford.edu/service/survey">Click here to get started</a>.</p>
-<p><img src="week2_plot1.png" /></p>
-<p>Click on the “Set up a Qualtrics account” button and it will tell you to go to <a href="https://stanforduniversity.qualtrics.com" class="uri">https://stanforduniversity.qualtrics.com</a>. Go to that link!</p>
-<p><img src="week2_plot2.png" /></p>
-<p>There, it will ask if you have a preexisting Qualtrics account or not. Click the button that pertains to you. If you don’t have a preexisting account, it will either prompt you to log-in to your Stanford account via WebAuth, or else it will automatically log-in for you and set up your account if you are already logged in.</p>
-<p>Now you should be into Qualtrics! Since you haven’t made a project previously, you only have one option: Create a new project (bottom left). Everytime you want to make a new survey you will click this button. We will make an example survey to show you the ropes.</p>
-<p><img src="week2_plot3.png" /></p>
-<p>It will bring you to a page with a bunch of options for creating a new survey. You can start from these pre-designed surveys if they fall in line with the kind of survey you want to run. There are even pre-built surveys for academics. For learning purposes though, we will start from scratch by clicking “From Scratch–Survey”.</p>
-<p>Now it asks us to name our project. I called it First Survey.</p>
-<p><img src="week2_plot4.png" />
-## Building a survey</p>
-<p>With a project created, we have been ported to Qualtric’s main user interface, where we can build a survey. Have a look around at all of the different options. Qualtrics is full of tools for creating your ideal survey, but at times that functionality can be a bit overwhelming.</p>
-<p><img src="week2_plot5.png" /></p>
-<p>We will start simple. Let’s start by learning how to add a question to our survey. Click the menue under “Question type” on the left and select “Text entry”.</p>
-<p><img src="week2_plot6.png" /></p>
-<p>There are a bunch of options and I recommend experimenting/reading up on all of them. The most essential are Text Entry, Multiple Choice, and Matrix Table. Our first question will use Text Entry. It allows us to ask a question and then have the user put in any value that they like. Multiple Choice on the other hand would let us specify the answers they can provide. For a question like – How old are you? – there are too many potential responses for multiple choice to work well, so text entry will do.</p>
-<p>We can change the text at the top of the question box to specify the question the respondent should answer:</p>
-<p><img src="week2_plot7.png" /></p>
-<p>Let’s for example ask “How old are you?”</p>
-<p><img src="week2_plot8.png" /></p>
-<p>Next let’s make a more complicated multiple choice question using the matrix table. It basically allows you to ask multiple multiple choice questions at once. Let’s start by clicking the blue button “Add new question” and selecting the option “Matrix table”.</p>
-<p>For example, we can copy a question from the GSS about trust in institutions to see the extent to which our respondents trust different groups, like their family or the government.</p>
-<p><img src="week2_plot9.png" />
-Cool! Maybe trust of this sort varies by income - we might expect rich people to support institutions more than the poor, for example, because they have historically benefitted from them.</p>
-<p><img src="week2_plot10.png" /></p>
-<p>If we want to put the income question after age, we can simply drag it upwards so that it comes before the question on trust.</p>
-<p>We don’t have to come up with all of the questions ourselves - Qualtrics has a question bank that you can use to find pre-written questions. Just click on the “Import from library” button at the bottom of the page.</p>
-<p><img src="week2_plot11.png" />
-I here import one on education level from the US demographics library.</p>
-<p><img src="week2_plot12.png" /></p>
-</div>
-<div id="survey-options" class="section level2 hasAnchor" number="2.3">
-<h2><span class="header-section-number">2.3</span> Survey options<a href="surveys-and-survey-experiments-with-qualtrics.html#survey-options" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>At the bottom, we could add more question blocks (we will skip for now) and edit your end of survey message. You can customize it by scrolling down the options under “Messaging” on the left.</p>
-<p><img src="week2_plot13.png" /></p>
-<p>Now let’s preview our min-survey by clicking “Preview” button on the top!</p>
-<p><img src="week2_plot14.png" /></p>
-</div>
-<div id="a-quick-survey-experiment" class="section level2 hasAnchor" number="2.4">
-<h2><span class="header-section-number">2.4</span> A quick survey experiment<a href="surveys-and-survey-experiments-with-qualtrics.html#a-quick-survey-experiment" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>To set up a survey experiment, we have to set up a block of questions from which respondents will only get one of the N questions in the block. This selection is randomized, so that we can see how the randomization affects their responses. Here is a quick example.</p>
-<p>First add a new block. Now we have two blocks. Now add the two different versions of the survey prompt to the block.</p>
-<p><img src="week2_plot15.png" /></p>
-<p>The last step is to make sure that the questions from this block are sampled randomly for each respondent, and that only one of these questions will be selected. We can achieve this by editing the block’s options. Click the block and select the Question Randomization option one the left.</p>
-<p>This should pull up the Question Randomization menu. We can choose: no randomization, to randomize the order of questions, or to randomly select N questions from the block to present to the respondent. Select the last optin and set the number to 1 and we will have our first survey experiment.</p>
-<p><img src="week2_plot16.png" /></p>
-</div>
-<div id="publish-it" class="section level2 hasAnchor" number="2.5">
-<h2><span class="header-section-number">2.5</span> Publish it!<a href="surveys-and-survey-experiments-with-qualtrics.html#publish-it" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Now we can either preview again to double check or publish the survey! Once it is published, we can distribute it to respondents. We could do this on Mechanical Turk, as we will learn in a later class, or we can just send it to our friends. To do that click on the “Distributions” tab at the top of the survey. It will ask how you want to distribute your survey.</p>
-<p>You can do it by email, or by my preferred way, which is to “Get a single reusable link” which you can send to anyone who you want to take your survey. You can also generate a trackable link for each respondent if you want to keep track of who responded.</p>
-<p>When someone responds to your survey, inside the Data and Analysis pane in Qualtrics, you should see a response!</p>
-<p><img src="week2_plot17.png" /></p>
-<p>We can export it using the “Export &amp; Import” data button and then clicking Export Data. Export it as a .csv because those files are super easy to load into R. It will download a .zip file to your computer. Once you unzip it, you will be able to load the resulting file into R. First, I would rename it, so that it is easy to input into R. I called the file trial_survey.csv. Drag it to your R project and then you can load it into R using the read.csv() function. Simple!</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="surveys-and-survey-experiments-with-qualtrics.html#cb44-1" tabindex="-1"></a>survey <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;Data/first_survey.csv&quot;</span>)</span></code></pre></div>
+<div id="llm-as-synthetic-respondents-for-social-survey" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> LLM as “Synthetic Respondents” for Social Survey<a href="large-language-models.html#llm-as-synthetic-respondents-for-social-survey" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this tutorial, I want to introduce how to interact with LLM with R and how to use LLM to serve as synthetic respondents for social science surveys.</p>
+<p>Let’s imagine instead of collecting responses from real humans, we conduct General Social Survey (GSS) on LLM. We can then compare the synthetic responses with the actual human responses. Specifically, I use the 2018 GSS results as the reference.</p>
+<p>Let’s first load the 2018 GSS data. Specifically, I am interested in generating sythetic responses for presidential voting preference in the 2012 Prsidential election.</p>
+<p>Let’s keeps only the columns we need for this demonstration:</p>
+<p>age – respondent’s age in years (continuous).
+sex – recorded gender (male/female).
+race – self-identified race (white/black/other in 2018).
+realrinc – real annual family income in 2018 dollars (numeric).
+educ – years of schooling completed (0–20).
+pres12 – presidential vote in the 2012 election (Obama, Romney, Other, Didn’t vote).</p>
+<p>These variables give the LLM enough demographic context to generate a plausible vote while keeping the prompt short.</p>
+<pre><code>gss2018 &lt;- read_dta(&quot;GSS2018.dta&quot;) %&gt;%
+  select(age, sex, race, realinc, educ, pres12) </code></pre>
+<p>Let’s further clean the data.</p>
+<pre><code>gss2018$age &lt;- as.numeric(gss2018$age)
+gss2018$realinc &lt;- as.numeric(gss2018$realinc)
+gss2018$educ &lt;- as.numeric(gss2018$educ)
+gss2018$pres12 &lt;- as.factor(gss2018$pres12)
+gss2018$sex &lt;- as.factor(gss2018$sex)
+gss2018$race &lt;- as.factor(gss2018$race)
+
+gss2018 &lt;- gss2018 %&gt;%
+  filter(!is.na(pres12)) %&gt;%
+  filter(!is.na(realinc)) %&gt;%
+  filter(age &gt; 26)</code></pre>
+<p>Let’s see the actual voting pattern in the survey</p>
+<pre><code>vote_dist &lt;- gss2018 %&gt;%                     
+  count(pres12) %&gt;%                            
+  mutate(pct = n / sum(n)) 
+print(vote_dist)</code></pre>
+<p>1 corresponds to Obama
+2 corresponds to Romney
+3 corresponds to Other
+4 corresponds to Did not vote</p>
+<pre><code>print(vote_dist)
+# A tibble: 4 × 3
+  pres12     n     pct
+  &lt;fct&gt;  &lt;int&gt;   &lt;dbl&gt;
+1 1        850 0.647  
+2 2        439 0.334  
+3 3         18 0.0137 
+4 4          7 0.00533</code></pre>
 
 </div>
 </div>
@@ -306,8 +303,8 @@ I here import one on education level from the US demographics library.</p>
           </div>
         </div>
       </div>
-<a href="intro-to-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="regression-and-classification.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="machine-learning-supervised-learning.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -338,7 +335,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/yuzesui97/soc10_2025spring/edit/main/03-Surveys_and_Survey_Experiments.Rmd",
+"link": "https://github.com/yuzesui97/soc10_2025spring/edit/main/09-Large_Language_Models.Rmd",
 "text": "Edit"
 },
 "history": {
@@ -346,7 +343,7 @@ gitbook.start({
 "text": null
 },
 "view": {
-"link": "https://github.com/yuzesui97/soc10_2025spring/blob/main/03-Surveys_and_Survey_Experiments.Rmd",
+"link": "https://github.com/yuzesui97/soc10_2025spring/blob/main/09-Large_Language_Models.Rmd",
 "text": null
 },
 "download": null,

@@ -45,3 +45,6 @@ splitting-the-gss-2018-data
 linear-regression-with-training-and-test-data
 decision-trees-for-regression
 random-forests
+large-language-models
+tidychatmodels-package
+llm-as-synthetic-respondents-for-social-survey

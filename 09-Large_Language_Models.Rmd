@@ -1,0 +1,82 @@
+# Large Language Models
+
+This tutorial provides a hands-on way to see how large-language-model (LLM) APIs can be integrated into an R research workflow for computational social science. Using the 2018 General Social Survey, we first review tidy data handling, then prompt Mistral AI to act as “synthetic respondents” whose age, sex, race, income, and education match each sampled case. 
+
+By contrasting the model’s predicted 2012 presidential vote with the survey’s actual vote distribution and visualising the differences, students learn three key lessons: (1) how to call and parameterize an LLM from R with the {tidychatmodels} grammar; (2) how prompt wording and sampling settings affect generated outputs; and (3) why synthetic text should be interpreted cautiously when compared to real human behavior.
+
+## tidychatmodels Package
+In this tutorial, we will use the R package "tidychatmodels", a recently developed R package by Albert Rapp for LLM API calls, to explore how to integrate LLMs into computational social science research. I also recommend you to read the online documentation for tidychatmodels: https://albert-rapp.de/posts/20_tidychatmodels/20_tidychatmodels
+
+```
+library(devtools)
+devtools::install_github("AlbertRapp/tidychatmodels")
+library(tidychatmodels)
+```
+We also need to following packages for today's tutorial
+```
+library(haven)
+library(tidyverse)
+library(glue)
+library(scales)
+library(pins)
+```
+## LLM as “Synthetic Respondents” for Social Survey
+In this tutorial, I want to introduce how to interact with LLM with R and how to use LLM to serve as synthetic respondents for social science surveys. 
+
+Let's imagine instead of collecting responses from real humans, we conduct General Social Survey (GSS) on LLM. We can then compare the synthetic responses with the actual human responses. Specifically, I use the 2018 GSS results as the reference. 
+
+Let's first load the 2018 GSS data. Specifically, I am interested in generating sythetic responses for presidential voting preference in the 2012 Prsidential election. 
+
+Let's keeps only the columns we need for this demonstration:
+
+  age – respondent’s age in years (continuous).
+  sex – recorded gender (male/female).
+  race – self-identified race (white/black/other in 2018).
+  realrinc – real annual family income in 2018 dollars (numeric).
+  educ – years of schooling completed (0–20).
+  pres12 – presidential vote in the 2012 election (Obama, Romney,   Other, Didn’t vote).
+
+These variables give the LLM enough demographic context to generate a plausible vote while keeping the prompt short.
+
+```
+gss2018 <- read_dta("GSS2018.dta") %>%
+  select(age, sex, race, realinc, educ, pres12) 
+```
+Let's further clean the data. 
+
+```
+gss2018$age <- as.numeric(gss2018$age)
+gss2018$realinc <- as.numeric(gss2018$realinc)
+gss2018$educ <- as.numeric(gss2018$educ)
+gss2018$pres12 <- as.factor(gss2018$pres12)
+gss2018$sex <- as.factor(gss2018$sex)
+gss2018$race <- as.factor(gss2018$race)
+
+gss2018 <- gss2018 %>%
+  filter(!is.na(pres12)) %>%
+  filter(!is.na(realinc)) %>%
+  filter(age > 26)
+```
+
+Let's see the actual voting pattern in the survey
+```
+vote_dist <- gss2018 %>%                     
+  count(pres12) %>%                            
+  mutate(pct = n / sum(n)) 
+print(vote_dist)
+```
+1 corresponds to Obama 
+2 corresponds to Romney
+3 corresponds to Other 
+4 corresponds to Did not vote
+```
+print(vote_dist)
+# A tibble: 4 × 3
+  pres12     n     pct
+  <fct>  <int>   <dbl>
+1 1        850 0.647  
+2 2        439 0.334  
+3 3         18 0.0137 
+4 4          7 0.00533
+```
+
