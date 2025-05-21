@@ -213,7 +213,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8" data-path="large-language-models.html"><a href="large-language-models.html"><i class="fa fa-check"></i><b>8</b> Large Language Models</a>
 <ul>
 <li class="chapter" data-level="8.1" data-path="large-language-models.html"><a href="large-language-models.html#tidychatmodels-package"><i class="fa fa-check"></i><b>8.1</b> tidychatmodels Package</a></li>
-<li class="chapter" data-level="8.2" data-path="large-language-models.html"><a href="large-language-models.html#llm-as-synthetic-respondents-for-social-survey"><i class="fa fa-check"></i><b>8.2</b> LLM as “Synthetic Respondents” for Social Survey</a></li>
+<li class="chapter" data-level="8.2" data-path="large-language-models.html"><a href="large-language-models.html#llm-as-synthetic-respondents-for-social-survey-set-up"><i class="fa fa-check"></i><b>8.2</b> LLM as “Synthetic Respondents” for Social Survey: Set-up</a></li>
+<li class="chapter" data-level="8.3" data-path="large-language-models.html"><a href="large-language-models.html#llm-as-synthetic-respondents-for-social-survey-query"><i class="fa fa-check"></i><b>8.3</b> LLM as “Synthetic Respondents” for Social Survey: Query</a></li>
+<li class="chapter" data-level="8.4" data-path="large-language-models.html"><a href="large-language-models.html#other-use-cases-of-llm-apis-in-computatinal-social-science"><i class="fa fa-check"></i><b>8.4</b> Other Use Cases of LLM APIs in Computatinal Social Science</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -251,8 +253,8 @@ library(glue)
 library(scales)
 library(pins)</code></pre>
 </div>
-<div id="llm-as-synthetic-respondents-for-social-survey" class="section level2 hasAnchor" number="8.2">
-<h2><span class="header-section-number">8.2</span> LLM as “Synthetic Respondents” for Social Survey<a href="large-language-models.html#llm-as-synthetic-respondents-for-social-survey" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="llm-as-synthetic-respondents-for-social-survey-set-up" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> LLM as “Synthetic Respondents” for Social Survey: Set-up<a href="large-language-models.html#llm-as-synthetic-respondents-for-social-survey-set-up" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this tutorial, I want to introduce how to interact with LLM with R and how to use LLM to serve as synthetic respondents for social science surveys.</p>
 <p>Let’s imagine instead of collecting responses from real humans, we conduct General Social Survey (GSS) on LLM. We can then compare the synthetic responses with the actual human responses. Specifically, I use the 2018 GSS results as the reference.</p>
 <p>Let’s first load the 2018 GSS data. Specifically, I am interested in generating sythetic responses for presidential voting preference in the 2012 Prsidential election.</p>
@@ -270,9 +272,9 @@ pres12 – presidential vote in the 2012 election (Obama, Romney, Other, Didn’
 <pre><code>gss2018$age &lt;- as.numeric(gss2018$age)
 gss2018$realinc &lt;- as.numeric(gss2018$realinc)
 gss2018$educ &lt;- as.numeric(gss2018$educ)
-gss2018$pres12 &lt;- as.factor(gss2018$pres12)
-gss2018$sex &lt;- as.factor(gss2018$sex)
-gss2018$race &lt;- as.factor(gss2018$race)
+gss2018$pres12 &lt;- as.character(gss2018$pres12)
+gss2018$sex &lt;- as.character(gss2018$sex)
+gss2018$race &lt;- as.character(gss2018$race)
 
 gss2018 &lt;- gss2018 %&gt;%
   filter(!is.na(pres12)) %&gt;%
@@ -295,6 +297,190 @@ print(vote_dist)</code></pre>
 2 2        439 0.334  
 3 3         18 0.0137 
 4 4          7 0.00533</code></pre>
+<p>Let’s code numueric values with actual readable choice categories:</p>
+<pre><code>gss2018$pres12[gss2018$pres12==&quot;1&quot;] &lt;-&quot;Obama&quot;
+gss2018$pres12[gss2018$pres12==&quot;2&quot;] &lt;-&quot;Romney&quot;
+gss2018$pres12[gss2018$pres12==&quot;3&quot;] &lt;-&quot;Other&quot;
+gss2018$pres12[gss2018$pres12==&quot;4&quot;] &lt;-&quot;Did not vote&quot;
+
+gss2018$sex[gss2018$sex==&quot;1&quot;] &lt;-&quot;Male&quot;
+gss2018$sex[gss2018$sex==&quot;2&quot;] &lt;-&quot;Female&quot;
+
+gss2018$race[gss2018$race==&quot;1&quot;] &lt;-&quot;White&quot;
+gss2018$race[gss2018$race==&quot;2&quot;] &lt;-&quot;Black&quot;
+gss2018$race[gss2018$race==&quot;3&quot;] &lt;-&quot;Non-White and Non-Black&quot;</code></pre>
+<p>Next is to get sythetic responses from LLM. The first step is creating a prompt (i.e., an instruction) for the LLM. Through prompting, we force the LLM to imagine itself to be a person with certain demographic background:</p>
+<pre><code>make_prompt &lt;- function(age, sex, race, income, educ) {
+  glue(&quot;Imagine you are a {age}-year-old {race} {sex} as in 2018. &quot;,
+       &quot;You earn ${comma(income, accuracy = 1)} per year as in 2018&quot;,
+       &quot;and completed {educ} years of schooling as in 2018. &quot;,
+       &quot;Who did you vote for in the 2012 US presidential election? &quot;,
+       &quot;Reply **with exactly one** of: Obama, Romney, Other, Did_not_vote.&quot;, 
+       &quot;Just return choices from the above four options. No extra word or setence in your response is allowed.&quot;)
+}</code></pre>
+<p>We are now ready to interact with LLMs via API (recall we have encoutered the concept of API in the week for text analysis). We could use ChatGPT models (like ChatGPT 4o) but ChatGPT models are not free via API call. Instead, we use a free LLM provided by Mistral AI for this tutorial. You can set up an API key via console.mistral.ai.</p>
+<pre><code>Sys.setenv(MISTRAL_KEY = &quot;TYPE YOUR API KEY HERE!&quot;)
+
+mistral_chat &lt;- create_chat(&#39;mistral&#39;, Sys.getenv(&quot;MISTRAL_KEY&quot;)) %&gt;%
+  add_model(&#39;mistral-small-latest&#39;) %&gt;%
+  add_params(temperature = 0.2)   # control for randomness</code></pre>
+<p>I also paste the code for initiating ChatGPT models here fore reference.</p>
+<pre><code># ---- optional OpenAI branch 
+openai_chat &lt;- create_chat(&quot;openai&quot;, Sys.getenv(&quot;OAI_KEY&quot;)) %&gt;%
+                 add_model(&quot;gpt-4o&quot;) %&gt;%
+                 add_params(temperature = 0.3)
+}</code></pre>
+</div>
+<div id="llm-as-synthetic-respondents-for-social-survey-query" class="section level2 hasAnchor" number="8.3">
+<h2><span class="header-section-number">8.3</span> LLM as “Synthetic Respondents” for Social Survey: Query<a href="large-language-models.html#llm-as-synthetic-respondents-for-social-survey-query" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We can now query the LLM! Let’s generate 500 responses from LLM. Let’s first sample 500 real age, sex, race, realinc, and educ combinations from the 2018 GSS data to generate the prompt.</p>
+<pre><code>set.seed(42)
+n_demo  &lt;- 500
+sim_in  &lt;- gss2018 %&gt;% slice_sample(n = n_demo) %&gt;%
+           mutate(prompt = pmap_chr(list(age, sex, race,
+                                         realinc, educ), make_prompt))</code></pre>
+<p>We can check the output of sim_in, which include the 500 sampled real age, sex, race, realinc, and educ combinations and the associated prompt for LLM to respond.</p>
+<pre><code>head(sim_in)</code></pre>
+<pre><code># A tibble: 6 × 7
+    age sex    race  realinc  educ pres12 prompt                  
+  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;                   
+1    46 Male   White  72640     16 Obama  Imagine you are a 46-ye…
+2    66 Male   White  30645     20 Obama  Imagine you are a 66-ye…
+3    65 Male   White   8512.     8 Obama  Imagine you are a 65-ye…
+4    61 Female White  54480     20 Obama  Imagine you are a 61-ye…
+5    33 Male   White    227     12 Obama  Imagine you are a 33-ye…
+6    28 Male   White  24970     18 Obama  Imagine you are a 28-ye…</code></pre>
+<p>Now let’s query the LLM using the customized ask function and store the answer.</p>
+<pre><code>library(purrr)
+library(pins)
+library(stringr)
+
+# ---- helper that returns ONE cleaned token
+## out &lt;- … – sends the prompt to the model and gets back the full chat history as a character vector.
+## out[length(out)] – keeps only the last element (the assistant’s reply).
+-----------------------------
+ask_raw &lt;- function(chat, prompt) {
+  log_vec &lt;- chat %&gt;%
+    add_message(prompt) %&gt;%
+    perform_chat() %&gt;%
+    extract_chat()              # character vector, one element per turn
+
+  # 1. pick the assistant line (the one that begins with &#39;Assistant:&#39;)
+  assistant_line &lt;- log_vec[str_detect(log_vec, &quot;^Assistant:&quot;)]
+
+  # if for some reason that pattern isn&#39;t found, fall back to the last turn
+  if (length(assistant_line) == 0) assistant_line &lt;- tail(log_vec, 1)
+
+  # 2. remove the &#39;Assistant:&#39; tag, trim white-space
+  clean &lt;- str_trim(str_remove(assistant_line, &quot;^Assistant:\\s*&quot;))
+
+  # 3. collapse to length-1 string (in case of accidental line breaks)
+  paste(clean, collapse = &quot; &quot;)
+}</code></pre>
+<pre><code># ---- wrap it with a 1-request-per-sec rate limiter
+## safely() → converts run-time errors (e.g., HTTP 429) into an NA result instead of stopping the loop.
+## slowly() → enforces one call per second (rate_delay(1)), satisfying Mistral’s free-tier quota.
+## ask_thrott is the error-tolerant, rate-limited wrapper we’ll call inside the loop.
+---------------------
+ask_safe   &lt;- safely(ask_raw, otherwise = NA_character_)
+ask_thrott &lt;- slowly(ask_safe, rate = rate_delay(1))   # 1 request / second</code></pre>
+<pre><code># ---- prepare pin board and existing progress
+## Creates a temporary pins “board”. Everything we cache will live here under the name mistral_sim.
+--------------------------
+board    &lt;- board_temp()        # temp folder inside this R session
+pin_name &lt;- &quot;mistral_raw&quot;
+
+if (pin_exists(board, pin_name)) {
+  sim_out  &lt;- pin_read(board, pin_name)       # resume
+  done_ids &lt;- sim_out$row_id
+} else {
+  sim_out  &lt;- tibble()                        # start fresh
+  done_ids &lt;- integer(0)
+}</code></pre>
+<pre><code># ---- iterate row-by-row with progress bar
+## Adds a row_id column so we can track per-row completion, then builds a progress bar for user feedback.
+-----------------------------
+sim_in2 &lt;- sim_in %&gt;% mutate(row_id = row_number())      # keep row id
+todo    &lt;- sim_in2 %&gt;% filter(!row_id %in% done_ids)     # rows still to query
+
+pb &lt;- progress::progress_bar$new(
+  format = &quot;  querying [:bar] :percent eta: :eta&quot;,
+  total  = nrow(todo)
+)</code></pre>
+<pre><code># Loop body: queries the LLM at a safe rate, appends the new vote (or NA on error) to sim_out, and advances the progress bar.
+-----------------------------
+for (i in seq_len(nrow(todo))) {
+  row  &lt;- todo[i, ]
+  ans  &lt;- ask_thrott(mistral_chat, row$prompt)  # throttled API call
+  raw  &lt;- ans$result                            # NA if error
+
+  sim_out &lt;- bind_rows(sim_out,
+                       row %&gt;% mutate(llm_raw = raw))
+
+  pb$tick()
+
+  # write/update pin every 25 rows (or on final row)
+  if (i %% 25 == 0 || i == nrow(todo)) {
+    pin_write(board, sim_out, pin_name, type = &quot;rds&quot;)
+  }
+}</code></pre>
+<p>Let’s see what we got for the llm responses:</p>
+<pre><code>head(sim_out$llm_raw)
+[1] &quot;assistant Romney&quot;       &quot;assistant Romney&quot;       &quot;assistant Did_not_vote&quot;
+[4] &quot;assistant Did_not_vote&quot; &quot;assistant Did_not_vote&quot; &quot;assistant Did_not_vote&quot;</code></pre>
+<p>Apparently, we need to further clean up the raw responses:</p>
+<pre><code>sim_out &lt;- sim_out %&gt;%
+  mutate(
+    # 1. strip the role tag and whitespace
+    llm_vote = str_remove(llm_raw, &quot;^assistant\\s*&quot;) |&gt; str_trim(),
+    
+    # 2. standardise to four canonical values (anything else → NA)
+    llm_vote = case_when(
+      str_detect(llm_vote, regex(&quot;^Obama$&quot;,          ignore_case = TRUE)) ~ &quot;Obama&quot;,
+      str_detect(llm_vote, regex(&quot;^Romney$&quot;,         ignore_case = TRUE)) ~ &quot;Romney&quot;,
+      str_detect(llm_vote, regex(&quot;^Other$&quot;,          ignore_case = TRUE)) ~ &quot;Other&quot;,
+      str_detect(llm_vote, regex(&quot;^Did[_ ]?not[_ ]?vote$&quot;, ignore_case = TRUE)) ~ &quot;Did not vote&quot;,
+      TRUE ~ NA_character_
+    )
+  )</code></pre>
+<p>Let’s compare the actual response distribution with the sythetic ones!</p>
+<pre><code>real &lt;- sim_out %&gt;% count(pres12, name = &quot;real_n&quot;) %&gt;%
+        mutate(real_pct = real_n / sum(real_n))
+
+# ── 1. Compute synthetic distribution in numeric form ────────────────
+synthetic &lt;- sim_out %&gt;%
+  filter(!is.na(llm_vote)) %&gt;%                 # drop invalid / NA answers
+  count(pres12 = llm_vote, name = &quot;llm_n&quot;) %&gt;% # same column name as real
+  mutate(llm_pct = llm_n / sum(llm_n))
+
+# ── 2. Join &amp; reshape for plotting ───────────────────────────────────
+plot_df &lt;- full_join(real, synthetic, by = &quot;pres12&quot;) %&gt;%         # combine
+  pivot_longer(cols = c(real_pct, llm_pct),                      # wide → long
+               names_to  = &quot;source&quot;,
+               values_to = &quot;pct&quot;) %&gt;%
+  mutate(source = recode(source,
+                         real_pct = &quot;Actual GSS&quot;,
+                         llm_pct  = &quot;LLM (Mistral)&quot;))
+
+# ── 3. Side-by-side bar chart ────────────────────────────────────────
+ggplot(plot_df, aes(x = pres12, y = pct, fill = source)) +
+  geom_col(position = &quot;dodge&quot;) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  scale_fill_manual(values = c(&quot;Actual GSS&quot; = &quot;steelblue&quot;,
+                               &quot;LLM (Mistral)&quot; = &quot;darkorange&quot;)) +
+  labs(title = &quot;2012 Presidential Vote: Actual vs. Synthetic Respondents&quot;,
+       x = NULL, y = &quot;Share of respondents&quot;,
+       fill = NULL) +
+  theme_minimal(base_size = 13)</code></pre>
+<p><img src="week8_plot1.png" />
+We can compare the alignment using different LLMs.</p>
+</div>
+<div id="other-use-cases-of-llm-apis-in-computatinal-social-science" class="section level2 hasAnchor" number="8.4">
+<h2><span class="header-section-number">8.4</span> Other Use Cases of LLM APIs in Computatinal Social Science<a href="large-language-models.html#other-use-cases-of-llm-apis-in-computatinal-social-science" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li>We can ask LLMs to evaluate/label the sentiment of different text/documents</li>
+<li>Coding open-ended survey answers: Instead of hiring dozens of coders to transform free-text responses into numeric categories (e.g., “occupation”, “policy preference”), an LLM can propose a code and a confidence score; researchers then audit a stratified subsample for reliability.</li>
+</ol>
 
 </div>
 </div>

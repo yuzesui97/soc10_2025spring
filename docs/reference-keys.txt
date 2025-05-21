@@ -47,4 +47,6 @@ decision-trees-for-regression
 random-forests
 large-language-models
 tidychatmodels-package
-llm-as-synthetic-respondents-for-social-survey
+llm-as-synthetic-respondents-for-social-survey-set-up
+llm-as-synthetic-respondents-for-social-survey-query
+other-use-cases-of-llm-apis-in-computatinal-social-science
